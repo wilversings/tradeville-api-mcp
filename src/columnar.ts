@@ -1,4 +1,4 @@
-import type { TradevilleResponse } from "./types.js";
+import type { TradevilleResponse, JsonValue } from "./types.js";
 
 /**
  * Tradeville responses carry tabular data nested under a `data` property, as a
@@ -9,7 +9,9 @@ import type { TradevilleResponse } from "./types.js";
  * Non-tabular responses (e.g. an ack like `{ OK: 1 }`, with no `data`) are
  * returned as-is, stripped of the `cmd`/`prm` envelope.
  */
-export function columnarToRows(raw: TradevilleResponse): unknown[] | Record<string, unknown> {
+export function columnarToRows(
+  raw: TradevilleResponse
+): JsonValue[] | Record<string, JsonValue | undefined> {
   const { cmd, prm, data, ...rest } = raw;
   void cmd;
   void prm;
@@ -19,16 +21,16 @@ export function columnarToRows(raw: TradevilleResponse): unknown[] | Record<stri
 
   // Fall back to treating the whole envelope (minus cmd/prm) as columnar,
   // in case a command ever returns the table at the top level instead.
-  const table2 = transposeIfColumnar(rest);
+  const table2 = transposeIfColumnar(rest as JsonValue);
   if (table2 !== undefined) return table2;
 
-  return data !== undefined ? (data as Record<string, unknown>) : rest;
+  return data !== undefined ? (data as Record<string, JsonValue>) : rest;
 }
 
-function transposeIfColumnar(value: unknown): unknown[] | undefined {
+function transposeIfColumnar(value: JsonValue | undefined): JsonValue[] | undefined {
   if (typeof value !== "object" || value === null || Array.isArray(value)) return undefined;
 
-  const obj = value as Record<string, unknown>;
+  const obj = value;
   const keys = Object.keys(obj);
   if (keys.length === 0) return undefined;
 
@@ -36,14 +38,14 @@ function transposeIfColumnar(value: unknown): unknown[] | undefined {
   const allArrays = values.every((v) => Array.isArray(v));
   if (!allArrays) return undefined;
 
-  const length = (values[0] as unknown[]).length;
-  const sameLength = values.every((v) => (v as unknown[]).length === length);
+  const length = (values[0] as JsonValue[]).length;
+  const sameLength = values.every((v) => (v as JsonValue[]).length === length);
   if (!sameLength) return undefined;
 
-  const rows: Record<string, unknown>[] = [];
+  const rows: Record<string, JsonValue>[] = [];
   for (let i = 0; i < length; i++) {
-    const row: Record<string, unknown> = {};
-    for (const k of keys) row[k] = (obj[k] as unknown[])[i];
+    const row: Record<string, JsonValue> = {};
+    for (const k of keys) row[k] = (obj[k] as JsonValue[])[i];
     rows.push(row);
   }
   return rows;

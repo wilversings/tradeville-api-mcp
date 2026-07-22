@@ -16,7 +16,7 @@ for (const tool of tools) {
   server.registerTool(
     tool.name,
     { description: tool.description, inputSchema: tool.schema },
-    async (args: Record<string, unknown>) => {
+    async (args) => {
       try {
         const params = tool.toParams(args ?? {});
         const response = await client.request(tool.cmd, params);

@@ -1,18 +1,24 @@
 import { z } from "zod";
+import type { TradeParams } from "./types.js";
 
-export interface ToolDefinition {
+export interface ToolDefinition<Shape extends z.ZodRawShape = z.ZodRawShape> {
   name: string;
   description: string;
-  schema: Record<string, z.ZodTypeAny>;
+  schema: Shape;
   cmd: string;
-  toParams: (args: Record<string, unknown>) => Record<string, unknown>;
+  toParams(args: z.infer<z.ZodObject<Shape>>): TradeParams;
+}
+
+/** Preserves each tool's own arg shape for `toParams`, while still fitting in a `ToolDefinition[]`. */
+function defineTool<Shape extends z.ZodRawShape>(tool: ToolDefinition<Shape>): ToolDefinition<Shape> {
+  return tool;
 }
 
 const DATE_DESC =
   'Date string. Accepts the Tradeville compact form (e.g. "1oct20") or an ISO date ("2020-10-01").';
 
 export const tools: ToolDefinition[] = [
-  {
+  defineTool({
     name: "get_portfolio",
     description:
       "Get the account portfolio (holdings) as of a given date, or the current portfolio if no date is given. " +
@@ -26,8 +32,8 @@ export const tools: ToolDefinition[] = [
     },
     cmd: "Portfolio",
     toParams: (args) => ({ data: args.date ?? null }),
-  },
-  {
+  }),
+  defineTool({
     name: "search_symbol",
     description:
       "Search for tradeable symbols whose name contains the given term. Returns rows with: Symbol, Name, ISIN.",
@@ -36,8 +42,8 @@ export const tools: ToolDefinition[] = [
     },
     cmd: "SearchSymbol",
     toParams: (args) => ({ search: args.search }),
-  },
-  {
+  }),
+  defineTool({
     name: "get_symbol",
     description:
       "Get current market data and reference details for a single symbol: price, bid/ask, day range, trading limits, " +
@@ -47,8 +53,8 @@ export const tools: ToolDefinition[] = [
     },
     cmd: "Symbol",
     toParams: (args) => ({ symbol: args.symbol }),
-  },
-  {
+  }),
+  defineTool({
     name: "get_market_depth",
     description:
       "Get order book depth (Level2) for a symbol: bid/ask price levels with quantities and order counts per level.",
@@ -66,8 +72,8 @@ export const tools: ToolDefinition[] = [
       symbol: args.symbol,
       ...(args.levels != null ? { levels: args.levels } : {}),
     }),
-  },
-  {
+  }),
+  defineTool({
     name: "get_daily_values",
     description:
       "Get daily OHLCV history for a symbol over a date range. Returns rows with: Symbol, Date, Open, Low, High, Close, " +
@@ -95,8 +101,8 @@ export const tools: ToolDefinition[] = [
       dend: args.dend,
       ...(args.adj != null ? { adj: args.adj } : {}),
     }),
-  },
-  {
+  }),
+  defineTool({
     name: "get_trades",
     description:
       "Get individual trade ticks for a symbol over a date range. Returns rows with: Symbol, Date, Price, Volume, Trades, " +
@@ -114,8 +120,8 @@ export const tools: ToolDefinition[] = [
     },
     cmd: "Trades",
     toParams: (args) => ({ symbol: args.symbol ?? null, dstart: args.dstart, dend: args.dend }),
-  },
-  {
+  }),
+  defineTool({
     name: "get_activity",
     description:
       "Get account activity (trades, deposits/withdrawals) for a symbol, or all symbols, over a date range. Returns rows with: " +
@@ -132,8 +138,8 @@ export const tools: ToolDefinition[] = [
     },
     cmd: "Activity",
     toParams: (args) => ({ symbol: args.symbol ?? null, dstart: args.dstart, dend: args.dend }),
-  },
-  {
+  }),
+  defineTool({
     name: "get_orders",
     description:
       "Get orders placed on a symbol, optionally starting from a given date. Returns rows with: OrderId, Symbol, Status, " +
@@ -148,8 +154,8 @@ export const tools: ToolDefinition[] = [
     },
     cmd: "Orders",
     toParams: (args) => ({ symbol: args.symbol, dstart: args.dstart ?? null }),
-  },
-  {
+  }),
+  defineTool({
     name: "get_fx_rates",
     description:
       "Get official BNR (Romanian National Bank) exchange rates for a currency over a date range, or all currencies if none " +
@@ -165,5 +171,5 @@ export const tools: ToolDefinition[] = [
     },
     cmd: "FXBNR",
     toParams: (args) => ({ ccy: args.ccy ?? null, dstart: args.dstart, dend: args.dend }),
-  },
+  }),
 ];

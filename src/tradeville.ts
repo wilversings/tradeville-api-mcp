@@ -1,5 +1,5 @@
 import { WebSocket } from "ws";
-import type { TradevilleConfig, TradevilleResponse } from "./types.js";
+import type { TradevilleConfig, TradevilleResponse, TradeParams } from "./types.js";
 
 const WS_URL = "wss://api.tradeville.ro:443";
 const PROTOCOL = "apitv";
@@ -27,7 +27,7 @@ export class TradevilleClient {
   private ws: WebSocket | null = null;
   private readyPromise: Promise<void> | null = null;
   private queue: PendingRequest[] = [];
-  private sendChain: Promise<unknown> = Promise.resolve();
+  private sendChain: Promise<TradevilleResponse | undefined> = Promise.resolve(undefined);
   private lastSendAt = 0;
 
   constructor(config?: Partial<TradevilleConfig>) {
@@ -41,7 +41,7 @@ export class TradevilleClient {
   }
 
   /** Send a command, connecting and logging in first if needed. */
-  async request(cmd: string, prm: Record<string, unknown> = {}): Promise<TradevilleResponse> {
+  async request(cmd: string, prm: TradeParams = {}): Promise<TradevilleResponse> {
     await this.ensureReady();
     return this.send(cmd, prm);
   }
@@ -105,13 +105,13 @@ export class TradevilleClient {
   }
 
   /** Enqueue a send, serialized after all previously enqueued sends complete. */
-  private send(cmd: string, prm: Record<string, unknown>): Promise<TradevilleResponse> {
+  private send(cmd: string, prm: TradeParams): Promise<TradevilleResponse> {
     const task = this.sendChain.then(() => this.doSend(cmd, prm));
     this.sendChain = task.catch(() => undefined);
     return task;
   }
 
-  private async doSend(cmd: string, prm: Record<string, unknown>): Promise<TradevilleResponse> {
+  private async doSend(cmd: string, prm: TradeParams): Promise<TradevilleResponse> {
     if (!this.ws || this.ws.readyState !== WebSocket.OPEN) {
       throw new Error("Tradeville connection is not open");
     }
