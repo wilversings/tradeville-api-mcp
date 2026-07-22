@@ -61,6 +61,7 @@ No `env` block needed — credentials are resolved from the keyring at startup.
 | `get_activity`     | Account activity (trades, deposits/withdrawals) for a date range |
 | `get_orders`       | Orders placed on a symbol                                        |
 | `get_fx_rates`     | Official BNR exchange rates for a currency/date range             |
+| `get_stock_screen` | Fundamental/valuation screening data for BVB stocks (static snapshot) |
 
 Results are arrays of row objects (columnar API responses transposed for readability). Dates accept
 either the API's compact form (`"1oct20"`) or ISO (`"2020-10-01"`).

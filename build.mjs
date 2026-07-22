@@ -3,7 +3,7 @@
 // dist/index.js with esbuild (bundling pulls in dependencies too, so tree shaking
 // can actually drop the unused parts of them).
 import { build } from "esbuild";
-import { chmodSync, mkdirSync, rmSync } from "node:fs";
+import { chmodSync, cpSync, mkdirSync, rmSync } from "node:fs";
 import { execFileSync } from "node:child_process";
 
 rmSync("dist", { recursive: true, force: true });
@@ -33,3 +33,6 @@ await build({
 });
 
 chmodSync("dist/index.js", 0o755);
+
+// Read at runtime (not bundled) since it's data, not code — see src/stockscreen.ts.
+cpSync("staticdata", "dist/staticdata", { recursive: true });

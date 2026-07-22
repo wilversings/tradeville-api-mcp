@@ -1,7 +1,13 @@
 import { z } from "zod";
 import type { TradeParams } from "./types.js";
 
-export interface ToolDefinition<Shape extends z.ZodRawShape = z.ZodRawShape> {
+/**
+ * Tools that forward to the Tradeville WebSocket API: each one issues a
+ * single `cmd`/`prm` request and returns the columnar response. Tools backed
+ * by something other than the API (e.g. local static data) are registered
+ * separately in index.ts instead of living here — see src/stockscreen.ts.
+ */
+export interface ApiToolDefinition<Shape extends z.ZodRawShape = z.ZodRawShape> {
   name: string;
   description: string;
   schema: Shape;
@@ -9,15 +15,15 @@ export interface ToolDefinition<Shape extends z.ZodRawShape = z.ZodRawShape> {
   toParams(args: z.infer<z.ZodObject<Shape>>): TradeParams;
 }
 
-/** Preserves each tool's own arg shape for `toParams`, while still fitting in a `ToolDefinition[]`. */
-function defineTool<Shape extends z.ZodRawShape>(tool: ToolDefinition<Shape>): ToolDefinition<Shape> {
+/** Preserves each tool's own arg shape for `toParams`, while still fitting in an `ApiToolDefinition[]`. */
+function defineTool<Shape extends z.ZodRawShape>(tool: ApiToolDefinition<Shape>): ApiToolDefinition<Shape> {
   return tool;
 }
 
 const DATE_DESC =
   'Date string. Accepts the Tradeville compact form (e.g. "1oct20") or an ISO date ("2020-10-01").';
 
-export const tools: ToolDefinition[] = [
+export const apiTools: ApiToolDefinition[] = [
   defineTool({
     name: "get_portfolio",
     description:
