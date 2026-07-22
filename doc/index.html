@@ -1,0 +1,3544 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="utf-8">
+        <title>API Tradeville</title>
+        <script src="https://cdn.rawgit.com/caldwell/renderjson/master/renderjson.js"></script>
+    </head>
+    <style>
+        html {
+            overflow: auto;
+            background-color: #fff;
+            font-size: 14px
+        }
+
+        body {
+            font-family: 'Open Sans',sans-serif;
+            line-height: 1.5;
+            color: #4d4e53;
+            background-color: #fff
+        }
+
+        a,a:active,a:visited {
+            color: #0095dd;
+            text-decoration: none
+        }
+
+        a:hover {
+            text-decoration: underline
+        }
+
+        header {
+            display: block;
+            padding: 0 4px
+        }
+
+        code,kbd,samp,tt {
+            font-family: Consolas,Monaco,'Andale Mono',monospace
+        }
+
+        .class-description {
+            font-size: 130%;
+            line-height: 140%;
+            margin-bottom: 1em;
+            margin-top: 1em
+        }
+
+        .class-description:empty {
+            margin: 0
+        }
+
+        #main {
+            float: left;
+            width: 70%
+        }
+
+        article dl {
+            margin-bottom: 40px
+        }
+
+        article img {
+            max-width: 100%
+        }
+
+        section {
+            display: block;
+            background-color: #fff;
+            padding: 12px 24px;
+            border-bottom: 1px solid #ccc;
+            margin-right: 30px
+        }
+
+        .variation {
+            display: none
+        }
+
+        .signature-attributes {
+            font-size: 60%;
+            color: #aaa;
+            font-style: italic;
+            font-weight: lighter
+        }
+
+        nav {
+            display: block;
+            float: right;
+            margin-top: 28px;
+            width: 30%;
+            box-sizing: border-box;
+            border-left: 1px solid #ccc;
+            padding-left: 16px
+        }
+
+        nav ul {
+            font-family: 'Lucida Grande','Lucida Sans Unicode',arial,sans-serif;
+            font-size: 100%;
+            line-height: 17px;
+            padding: 0;
+            margin: 0;
+            list-style-type: none
+        }
+
+        nav ul a,nav ul a:active,nav ul a:visited {
+            font-family: Consolas,Monaco,'Andale Mono',monospace;
+            line-height: 18px;
+            color: #4d4e53
+        }
+
+        nav h3 {
+            margin-top: 12px
+        }
+
+        nav li {
+            margin-top: 6px
+        }
+
+        footer {
+            display: block;
+            padding: 6px;
+            margin-top: 12px;
+            font-style: italic;
+            font-size: 90%
+        }
+
+        h1,h2,h3,h4 {
+            font-weight: 200;
+            margin: 0
+        }
+
+        h1 {
+            font-family: 'Open Sans Light',sans-serif;
+            font-size: 48px;
+            letter-spacing: -2px;
+            margin: 12px 24px 20px
+        }
+
+        h2,h3.subsection-title {
+            font-size: 30px;
+            font-weight: 700;
+            letter-spacing: -1px;
+            margin-bottom: 12px
+        }
+
+        h3 {
+            font-size: 24px;
+            letter-spacing: -.5px;
+            margin-bottom: 12px
+        }
+
+        h4 {
+            font-size: 18px;
+            letter-spacing: -.33px;
+            margin-bottom: 12px;
+            color: #4d4e53
+        }
+
+        .container-overview .subsection-title,h5 {
+            font-size: 120%;
+            font-weight: 700;
+            letter-spacing: -.01em;
+            margin: 8px 0 3px 0
+        }
+
+        h6 {
+            font-size: 100%;
+            letter-spacing: -.01em;
+            margin: 6px 0 3px 0;
+            font-style: italic
+        }
+
+        table {
+            border-spacing: 0;
+            border: 0;
+            border-collapse: collapse
+        }
+
+        td,th {
+            border: 1px solid #ddd;
+            margin: 0;
+            text-align: left;
+            vertical-align: top;
+            padding: 4px 6px;
+            display: table-cell
+        }
+
+        thead tr {
+            background-color: #ddd;
+            font-weight: 700
+        }
+
+        th {
+            border-right: 1px solid #aaa
+        }
+
+        tr>th:last-child {
+            border-right: 1px solid #ddd
+        }
+
+        .ancestors,.attribs {
+            color: #999
+        }
+
+        .ancestors a,.attribs a {
+            color: #999!important;
+            text-decoration: none
+        }
+
+        .clear {
+            clear: both
+        }
+
+        .important {
+            font-weight: 700;
+            color: #950b02
+        }
+
+        .yes-def {
+            text-indent: -1000px
+        }
+
+        .type-signature {
+            color: #aaa
+        }
+
+        .name,.signature {
+            font-family: Consolas,Monaco,'Andale Mono',monospace
+        }
+
+        .details {
+            margin-top: 14px;
+            border-left: 2px solid #ddd
+        }
+
+        .details dt {
+            width: 120px;
+            float: left;
+            padding-left: 10px;
+            padding-top: 6px
+        }
+
+        .details dd {
+            margin-left: 70px
+        }
+
+        .details ul {
+            margin: 0
+        }
+
+        .details ul {
+            list-style-type: none
+        }
+
+        .details li {
+            margin-left: 30px;
+            padding-top: 6px
+        }
+
+        .details pre.prettyprint {
+            margin: 0
+        }
+
+        .details .object-value {
+            padding-top: 0
+        }
+
+        .description {
+            margin-bottom: 1em;
+            margin-top: 1em
+        }
+
+        .code-caption {
+            font-style: italic;
+            font-size: 107%;
+            margin: 0
+        }
+
+        .source {
+            border: 1px solid #ddd;
+            width: 80%;
+            overflow: auto
+        }
+
+        .prettyprint.source {
+            width: inherit
+        }
+
+        .source code {
+            font-size: 100%;
+            line-height: 18px;
+            display: block;
+            padding: 4px 12px;
+            margin: 0;
+            background-color: #fff;
+            color: #4d4e53
+        }
+
+        .prettyprint code span.line {
+            display: inline-block
+        }
+
+        .prettyprint.linenums {
+            padding-left: 70px;
+            -webkit-user-select: none;
+            -moz-user-select: none;
+            -ms-user-select: none;
+            user-select: none
+        }
+
+        .prettyprint.linenums ol {
+            padding-left: 0
+        }
+
+        .prettyprint.linenums li {
+            border-left: 3px #ddd solid
+        }
+
+        .prettyprint.linenums li.selected,.prettyprint.linenums li.selected * {
+            background-color: #ffffe0
+        }
+
+        .prettyprint.linenums li * {
+            -webkit-user-select: text;
+            -moz-user-select: text;
+            -ms-user-select: text;
+            user-select: text
+        }
+
+        .name code,.params .name,.props .name {
+            color: #4d4e53;
+            font-family: Consolas,Monaco,'Andale Mono',monospace;
+            font-size: 100%
+        }
+
+        .params td.description>p:first-child,.props td.description>p:first-child {
+            margin-top: 0;
+            padding-top: 0
+        }
+
+        .params td.description>p:last-child,.props td.description>p:last-child {
+            margin-bottom: 0;
+            padding-bottom: 0
+        }
+
+        .disabled {
+            color: #454545
+        }
+
+        #active {
+            border-left: solid 3px #0072c6;
+            color: #0072c6;
+            border-spacing: 5px
+        }
+
+        .resp td,.resp th {
+            border: 1px solid #353434
+        }
+
+        #activity,#daily,#fxbnr,#level2,#orders,#portfolio,#pushh,#searchs,#simbool,#subscr,#trades {
+            text-shadow: none;
+            background: #f0efef;
+            padding: 1em
+        }
+
+        .renderjson a {
+            text-decoration: none
+        }
+
+        .renderjson .disclosure {
+            color: #dc143c;
+            font-size: 150%
+        }
+
+        .renderjson .syntax {
+            color: grey
+        }
+
+        .renderjson .string {
+            color: red
+        }
+
+        .renderjson .number {
+            color: #175757
+        }
+
+        .renderjson .boolean {
+            color: plum
+        }
+
+        .renderjson .key {
+            color: #294650
+        }
+
+        .renderjson .keyword {
+            color: #fafad2
+        }
+
+        .renderjson .object.syntax {
+            color: #20b2aa
+        }
+
+        .renderjson .array.syntax {
+            color: #ffa07a
+        }
+
+        #navig {
+            position: fixed;
+            right: 30px
+        }
+    </style>
+    <body>
+        <div id="main">
+            <h1 class="page-title">Documentatie API Tradeville</h1>
+            <h4 class="page-title" style="margin:-24px 24px 20px">
+                v1.1 - 22feb21
+                <section>
+                    <article>
+                        <h3>Introducere</h3>
+                        <h5 id="scop" class="anchor">Scop</h5>
+                        <p>Tradeville pune la dispozitia clientilor un API in scop de reporting, exclusiv pentru uz personal. Prin API se pot accesa date atat cu privire la activitatea contului de tranzactionare (portofoliul curent, istoricul de tranzactionare), cat si date de piata (istoricul tranzactiilor, ultimele cotatii pe simbol etc.).</p>
+                        <p>Din cauza contextului juridic, prin API nu se pot lansa in prezent ordine de tranzactionare. Aceasta functionalitate poate fi folosita in schimb pt conturile demo.</p>
+                        <p>In vederea accesarii API Tradeville, trebuie semnat un Act Aditional la contractul Tradeville. Pentru acest lucru, va rugam sa apelati la departamentul Helpdesk printr-un email sau folosind chatul din platforma</p>
+                        <h5 id="pimplementare" class="anchor">Principii de implementare</h5>
+                        <p>API-ul Tradeville poate fi folosit pentru a raspunde la nevoi punctuale de reporting (spre exemplu, pentru extragerea datelor privind portofoliul la un moment in timp in vederea elaborarii unui raport personalizat de risc).</p>
+                        <p>In acelasi timp, API Tradeville poate fi folosit drept mediu de comunicare in vederea constructiei unei interfete personalizate de monitorizare a pietei, actualizata cu ultimele cotatii live </p>
+                        <p>
+                            Pentru a indeplini al doilea scop, a fost nevoie de o solutie care sa permita comunicarea bidirectionala intre Tradeville si "aplicatia client".<br>
+                            Un simplu REST API nu permite transmiterea actualizarilor de cotatii prin push de catre Tradeville fara existenta unui server ridicat de catre "aplicatia client" sau un gateway cu acelasi scop.<br>
+                            Drept urmare, API Tradeville se bazeaza in totalitate pe comunicarea prin <a target="_blank" href="https://en.wikipedia.org/wiki/WebSocket">Websocket</a>
+                            , ce permite comunicarea bidirectionala cu cel mai mic nivel de efort/implementare/deployment din partea clientilor Tradeville.
+                        </p>
+                        <p>
+                            Comunicarea se realizeaza prin mesaje JSON. In cadrul fiecarui raspuns primit exista o propietate ce contine datele in forma bruta. In cazul in care acestea au o structura tabelara (spre exemplu in cazul comenzii Portfolio) serializarea acestora este in cadrul unui obiect JSON ce are ca propietati "coloanele tabelului", iar drept valori are array-uri cu elementele propriu-zise ale "tabelului". <br>Acest format a fost ales pentru serializare (in locul unui array de obiecte) deoarece permite compactarea cea mai eficienta.
+                        </p>
+                        <h5 id="pfolosire" class="anchor">Principii de folosire</h5>
+                        <p>Etapele pentru accesarea API Tradeville (indiferent de limbaj) sunt urmatoarele: </p>
+                        <ul>
+                            <li>Se deschide un websocket catre adresa wss://api.tradeville.ro:443, cu protocol "apitv". Modul in care se face acest lucru depinde de limbajul de programare folosit, insa fiecare limbaj are suport pentru conexiuni websocket (intr-un mod integrat, sau folosind pachete/module externe) </li>
+                            <li>Se efectueaza autentificarea in mediul Tradeville, prin transmiterea unei comenzi de login</li>
+                            <li>Ulterior autentificarii, se pot apela toate comenzile disponibile.</li>
+                        </ul>
+                        <p></p>
+                        <p>
+                            Pasul cel mai dificil este conectarea cu succes prin websocket. In caz de dificultati, verificati ca sunt specificate corect detaliile precum portul si protocolul indicat, respectiv ca sunt tratate corect evenimentele clasice aferente: onOpen, onClose, onMessage. <br>La finalul acestei documentatii sunt date cateva exemple practice de conectare, in mai multe limbaje de programare
+                        </p>
+                        <p>
+                            In cazul constructiei unei aplicatii complexe de monitorizare a plietei, un aspect important este modul in care se implementeaza actualizarea cotatiilor.<br>Acest lucru trebuie facut prin utilizarea comenzii Subscribe (la lista de simboluri dorita). Spre exemplu, pentru afisarea portofoliului curent de actiuni actualizat cu ultimele cotatii:
+                        </p>
+                        <ul>
+                            <li>initial trebuie apelata comanda Portfolio</li>
+                            <li>ulterior salvarii datelor din raspuns, se va apela comanda Subscribe pentru lista de simboluri din portofoliu</li>
+                            <li>din acel moment, se vor intercepta cotatiile noi primite, iar pe baza acestora se va actualiza portofoliul</li>
+                        </ul>
+                        O alta abordare (nerecomandata) este apelarea succesiva a comenzii Portfolio si exista o anumita limitare. Aceasta limitare este de "maxim 20 de comenzi in 10 secunde", iar daca se depaseste, raspunsul servit va contine un mesaj de eroare. Depasirea ocazionala nu ar trebui sa fie o problema pentru ca se reseteaza in maximum 20 de secunde. Depasirea frecventa va duce in schimb la activarea celorlalte protectii privind traficul, iar acolo nu putem sa dam detalii exacte privind limitele. <p></p>
+                        <p>Transmiterea comenzilor catre API Tradeville se face prin trimiterea unui JSON (sub forma de string, prin websocket) cu doua propietati: </p>
+                        <ul>
+                            <li>cmd: numele comenzii</li>
+                            <li>prm: un obiect (JSON) ce contine parametri specifici comenzii respective</li>
+                        </ul>
+                        Raspunsul returnat de catre server va contine intotdeauna aceste doua propietati, in vederea asocierii comanda-raspuns. <p></p>
+                        <h3>Comenzi disponibile</h3>
+                        <div id="login" class="anchor"></div>
+                        <strong>Comanda login</strong>
+                        <br>
+                        <br>
+                        <u>Descriere</u>
+                        : Efectueaza login si este obligatoriu sa se execute inaintea oricarei alte comenzi <br>
+                        <br>
+                        Parametri acceptati: <br>
+                        <br>
+                        <table class="params">
+                            <thead>
+                                <tr>
+                                    <th>Nume parametru</th>
+                                    <th>Tip parametru</th>
+                                    <th>Optional/Obligatoriu</th>
+                                    <th class="last">Descriere</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td class="name">
+                                        <code>coduser</code>
+                                    </td>
+                                    <td class="type">
+                                        <span class="param-type">String</span>
+                                    </td>
+                                    <td class="required">Obligatoriu</td>
+                                    <td class="description last">
+                                        <p>Codul de utilizator din platforma Tradeville</p>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td class="name">
+                                        <code>parola</code>
+                                    </td>
+                                    <td class="type">
+                                        <span class="param-type">String</span>
+                                    </td>
+                                    <td class="required">Obligatoriu</td>
+                                    <td class="description last">
+                                        <p>Parola aferenta contului</p>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td class="name">
+                                        <code>demo</code>
+                                    </td>
+                                    <td class="type">
+                                        <span class="param-type">Boolean</span>
+                                    </td>
+                                    <td class="required">Obligatoriu</td>
+                                    <td class="description last">
+                                        <p>Este sau nu un cont demo (true/false)</p>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                        <br>
+                        <strong>Exemplu comanda:</strong>
+                        { &quot;cmd &quot;: &quot;login &quot;, &quot;prm &quot;: { &quot;coduser &quot;: &quot;!DemoAPITDV &quot;, &quot;parola &quot;: &quot;DemoAPITDV &quot;, &quot;demo &quot;: true } } <br>
+                        <br>
+                        <strong>Raspuns prelucrat:</strong>
+                        <br>
+                        <br>
+                        <table class="params resp">
+                            <thead>
+                                <tr>
+                                    <th>coduser</th>
+                                    <th>parola</th>
+                                    <th>demo</th>
+                                    <th class="last">raspuns</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td>!DemoAPITDV</td>
+                                    <td>DemoAPITDV</td>
+                                    <td>true</td>
+                                    <td>Ok</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                        <br>
+                        <br>
+                        <strong>Raspuns neprelucrat:</strong>
+                        <div id="portfolio" class="anchor">
+                            <script>
+                                var login = {
+                                    cmd: "login",
+                                    prm: {
+                                        coduser: "!DemoAPITDV",
+                                        parola: "DemoAPITDV",
+                                        demo: !0
+                                    },
+                                    OK: 1
+                                };
+                                document.getElementById("portfolio").appendChild(renderjson(login))
+                            </script>
+                        </div>
+                        <br>
+                        <br>
+                        <strong>Comanda Portfolio</strong>
+                        <br>
+                        <br>
+                        <u>Descriere</u>
+                        : Returneaza ce aveti in portofoliu la o anumita data <br>
+                        <br>
+                        Parametri acceptati: <br>
+                        <br>
+                        <table class="params">
+                            <thead>
+                                <tr>
+                                    <th>Nume parametru</th>
+                                    <th>Tip parametru</th>
+                                    <th>Optional/Obligatoriu</th>
+                                    <th class="last">Descriere</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td class="name">
+                                        <code>data</code>
+                                    </td>
+                                    <td class="type">
+                                        <span class="param-type">Date</span>
+                                    </td>
+                                    <td class="required">Optional</td>
+                                    <td class="description last">
+                                        <p>Accepta si null, caz in care returneaza continutul portofoliului la data curenta</p>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                        <br>
+                        <strong>Exemplu comanda:</strong>
+                        { &quot;cmd &quot;: &quot;Portfolio &quot;, &quot;prm &quot;: { &quot;data &quot;: &quot;null &quot;} } <br>
+                        <br>
+                        <strong>Raspuns prelucrat:</strong>
+                        <br>
+                        <br>
+                        <table class="params resp">
+                            <thead>
+                                <tr>
+                                    <th>Account</th>
+                                    <th>Symbol</th>
+                                    <th>Quantity</th>
+                                    <th>AvgPrice</th>
+                                    <th>MarketPrice</th>
+                                    <th>PType</th>
+                                    <th class="last">Ccy</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td>!DEMOAPITDV</td>
+                                    <td>AAG</td>
+                                    <td>5003</td>
+                                    <td>2.996687889099121</td>
+                                    <td>3.16</td>
+                                    <td>A</td>
+                                    <td>RON</td>
+                                </tr>
+                                <tr>
+                                    <td>!DEMOAPITDV</td>
+                                    <td>BRD</td>
+                                    <td>100</td>
+                                    <td>14.359968185424805</td>
+                                    <td>14.02</td>
+                                    <td>A</td>
+                                    <td>RON</td>
+                                </tr>
+                                <tr>
+                                    <td>!DEMOAPITDV</td>
+                                    <td>CEON</td>
+                                    <td>10000</td>
+                                    <td>0.35698801279067993</td>
+                                    <td>0.388</td>
+                                    <td>A</td>
+                                    <td>RON</td>
+                                </tr>
+                                <tr>
+                                    <td>!DEMOAPITDV</td>
+                                    <td>PREB</td>
+                                    <td>5000</td>
+                                    <td>0.6134160161018372</td>
+                                    <td>1.54</td>
+                                    <td>A</td>
+                                    <td>RON</td>
+                                </tr>
+                                <tr>
+                                    <td>!DEMOAPITDV</td>
+                                    <td>PRSN</td>
+                                    <td>100000</td>
+                                    <td>0.06134159862995148</td>
+                                    <td>0.057</td>
+                                    <td>A</td>
+                                    <td>RON</td>
+                                </tr>
+                                <tr>
+                                    <td>!DEMOAPITDV</td>
+                                    <td>SNP</td>
+                                    <td>10000</td>
+                                    <td>0.4178268015384674</td>
+                                    <td>0.391</td>
+                                    <td>A</td>
+                                    <td>RON</td>
+                                </tr>
+                                <tr>
+                                    <td>!DemoAPITDV</td>
+                                    <td>RON</td>
+                                    <td>16622.1851</td>
+                                    <td>0</td>
+                                    <td>1</td>
+                                    <td>B</td>
+                                    <td>RON</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                        <br>
+                        <br>
+                        <strong>Raspuns neprelucrat:</strong>
+                        <div id="subscr" class="anchor">
+                            <script>
+                                var portfolio = {
+                                    Account: ["!DEMOAPITDV", "!DEMOAPITDV", "!DEMOAPITDV", "!DEMOAPITDV", "!DEMOAPITDV", "!DEMOAPITDV", "!DemoAPITDV"],
+                                    Symbol: ["AAG", "BRD", "CEON", "PREB", "PRSN", "SNP", "RON"],
+                                    Quantity: [5003, 100, 1e4, 5e3, 1e5, 1e4, 16622.1851],
+                                    AvgPrice: [2.996687889099121, 14.359968185424805, .35698801279067993, .6134160161018372, .06134159862995148, .4178268015384674, 0],
+                                    MarketPrice: [3.14, 14.36, .389, 1.565, .0585, .3995, 1],
+                                    PType: ["A", "A", "A", "A", "A", "A", "B"],
+                                    Ccy: ["RON", "RON", "RON", "RON", "RON", "RON", "RON"]
+                                };
+                                document.getElementById("subscr").appendChild(renderjson(portfolio))
+                            </script>
+                        </div>
+                        <br>
+                        <br>
+                        <strong>Comanda Subscribe</strong>
+                        <br>
+                        <br>
+                        <u>Descriere</u>
+                        : Efectueaza abonarea la unul sau mai multe simboluri <br>
+                        <br>
+                        Parametri acceptati: <br>
+                        <br>
+                        <table class="params">
+                            <thead>
+                                <tr>
+                                    <th>Nume parametru</th>
+                                    <th>Tip parametru</th>
+                                    <th>Optional/Obligatoriu</th>
+                                    <th class="last">Descriere</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td class="name">
+                                        <code>sym</code>
+                                    </td>
+                                    <td class="type">
+                                        <span class="param-type">String</span>
+                                    </td>
+                                    <td class="required">Obligatoriu</td>
+                                    <td class="description last">
+                                        <p>Simbolul la care se doreste abonarea (daca sunt mai multe, se separa prin virgula) </p>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                        <br>
+                        <strong>Exemplu comanda:</strong>
+                        { &quot;cmd &quot;: &quot;subscribe &quot;, &quot;sym &quot;: &quot;TLV &quot;, &quot;prm &quot;: {}, &quot;OK &quot;: 1 } <br>
+                        <br>
+                        <strong>Raspuns prelucrat:</strong>
+                        <br>
+                        <br>
+                        <table class="params resp">
+                            <table class="params resp">
+                                <thead>
+                                    <tr>
+                                        <th>cmd</th>
+                                        <th>sym</th>
+                                        <th>OK</th>
+                                        <th>prm</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr>
+                                        <td>subscribe</td>
+                                        <td>TLV</td>
+                                        <td>1</td>
+                                        <td>{}</td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                            <br>
+                            <br>
+                            <strong>Raspuns neprelucrat:</strong>
+                            <div id="fxbnr" class="anchor">
+                                <script>
+                                    var subscr = {
+                                        cmd: "subscribe",
+                                        sym: "TLV",
+                                        OK: 1,
+                                        prm: {}
+                                    };
+                                    document.getElementById("fxbnr").appendChild(renderjson(subscr))
+                                </script>
+                            </div>
+                            <br>
+                            <br>
+                            <strong>Date prin push prelucrate:</strong>
+                            <br>
+                            <br>
+                            <table class="param resp">
+                                <thead>
+                                    <tr>
+                                        <th>updtype</th>
+                                        <th>sim</th>
+                                        <th>pret</th>
+                                        <th>bid</th>
+                                        <th>ask</th>
+                                        <th>cbid</th>
+                                        <th>cask</th>
+                                        <th>volz</th>
+                                        <th>valz</th>
+                                        <th class="last">ref</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr>
+                                        <td>CA</td>
+                                        <td>TLV</td>
+                                        <td>2.205</td>
+                                        <td>2.2</td>
+                                        <td>2.205</td>
+                                        <td>1552</td>
+                                        <td>75057</td>
+                                        <td>1175332</td>
+                                        <td>2592291</td>
+                                        <td class="last">2.22</td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                            <br>
+                            <br>
+                            <strong>Date prin push neprelucrate:</strong>
+                            <div id="pushh"></div>
+                            <br>
+                            <br>
+                            <script>
+                                var pushh = {
+                                    updtype: "CA",
+                                    sim: "TLV",
+                                    pret: 2.205,
+                                    bid: 2.2,
+                                    ask: 2.205,
+                                    cbid: 1552,
+                                    cask: 75057,
+                                    volz: 1175332,
+                                    valz: 2592291,
+                                    ref: 2.22
+                                };
+                                document.getElementById("pushh").appendChild(renderjson(pushh))
+                            </script>
+                            <strong>Comanda FXBNR</strong>
+                            <br>
+                            <br>
+                            <u>Descriere</u>
+                            : Returneaza cursurile valutare comunicate de BNR (pentru o valuta, intr-o perioada) <br>
+                            <br>
+                            Parametri acceptati: <br>
+                            <br>
+                            <table class="params">
+                                <thead>
+                                    <tr>
+                                        <th>Nume parametru</th>
+                                        <th>Tip parametru</th>
+                                        <th>Optional/Obligatoriu</th>
+                                        <th class="last">Descriere</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr>
+                                        <td class="name">
+                                            <code>ccy</code>
+                                        </td>
+                                        <td class="type">
+                                            <span class="param-type">String</span>
+                                        </td>
+                                        <td class="required">Optional</td>
+                                        <td class="description last">
+                                            <p>Accepta si null, caz in care trimite cursurile BNR pentru toate valutele</p>
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td class="name">
+                                            <code>dstart</code>
+                                        </td>
+                                        <td class="type">
+                                            <span class="param-type">Date</span>
+                                        </td>
+                                        <td class="required">Obligatoriu</td>
+                                        <td class="description last">
+                                            <p>Data de inceput a perioadei</p>
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td class="name">
+                                            <code>dend</code>
+                                        </td>
+                                        <td class="type">
+                                            <span class="param-type">Date</span>
+                                        </td>
+                                        <td class="required">Obligatoriu</td>
+                                        <td class="description last">
+                                            <p>Data de sfarsit a perioadei</p>
+                                        </td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                            <br>
+                            <strong>Exemplu comanda:</strong>
+                            { &quot;cmd &quot;: &quot;FXBNR &quot;, &quot;prm &quot;: { &quot;ccy &quot;: &quot;EUR &quot;, &quot;dstart &quot;: &quot;1oct20 &quot;, &quot;dend &quot;: &quot;5oct20 &quot;} } <br>
+                            <br>
+                            <strong>Raspuns prelucrat:</strong>
+                            <br>
+                            <br>
+                            <table class="params resp">
+                                <thead>
+                                    <tr>
+                                        <th>Ccy</th>
+                                        <th>Date</th>
+                                        <th>Rate</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr>
+                                        <td>EUR</td>
+                                        <td>2020-10-01</td>
+                                        <td>4.8721</td>
+                                    </tr>
+                                    <tr>
+                                        <td>EUR</td>
+                                        <td>2020-10-02</td>
+                                        <td>4.8718</td>
+                                    </tr>
+                                    <tr>
+                                        <td>EUR</td>
+                                        <td>2020-10-03</td>
+                                        <td>4.8718</td>
+                                    </tr>
+                                    <tr>
+                                        <td>EUR</td>
+                                        <td>2020-10-04</td>
+                                        <td>4.8718</td>
+                                    </tr>
+                                    <tr>
+                                        <td>EUR</td>
+                                        <td>2020-10-05</td>
+                                        <td>4.8695</td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                            <br>
+                            <br>
+                            <strong>Raspuns neprelucrat:</strong>
+                            <div id="activity" class="anchor">
+                                <script>
+                                    var fxbnr = {
+                                        Ccy: ["EUR", "EUR", "EUR", "EUR", "EUR"],
+                                        Date: ["2020-10-01", "2020-10-02", "2020-10-03", "2020-10-04", "2020-10-05"],
+                                        Rate: [4.8721, 4.8718, 4.8718, 4.8718, 4.8695]
+                                    };
+                                    document.getElementById("activity").appendChild(renderjson(fxbnr))
+                                </script>
+                            </div>
+                            <br>
+                            <br>
+                            <strong>Comanda Activity</strong>
+                            <br>
+                            <br>
+                            <u>Descriere</u>
+                            : Returneaza activitatea din cont (pentru un simbol, intr-o perioada) <br>
+                            <br>
+                            Parametri acceptati: <br>
+                            <br>
+                            <table class="params">
+                                <thead>
+                                    <tr>
+                                        <th>Nume parametru</th>
+                                        <th>Tip parametru</th>
+                                        <th>Optional/Obligatoriu</th>
+                                        <th class="last">Descriere</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr>
+                                        <td class="name">
+                                            <code>symbol</code>
+                                        </td>
+                                        <td class="type">
+                                            <span class="param-type">String</span>
+                                        </td>
+                                        <td class="required">Optional</td>
+                                        <td class="description last">
+                                            <p>Accepta si null, caz in care trimite activitatea pe toate simbolurile</p>
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td class="name">
+                                            <code>dstart</code>
+                                        </td>
+                                        <td class="type">
+                                            <span class="param-type">Date</span>
+                                        </td>
+                                        <td class="required">Obligatoriu</td>
+                                        <td class="description last">
+                                            <p>Data de inceput a perioadei</p>
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td class="name">
+                                            <code>dend</code>
+                                        </td>
+                                        <td class="type">
+                                            <span class="param-type">Date</span>
+                                        </td>
+                                        <td class="required">Obligatoriu</td>
+                                        <td class="description last">
+                                            <p>Data de sfarsit a perioadei</p>
+                                        </td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                            <br>
+                            <strong>Exemplu comanda:</strong>
+                            { &quot;cmd &quot;: &quot;Activity &quot;, &quot;prm &quot;: { &quot;symbol &quot;: null, &quot;dstart &quot;: &quot;1oct19 &quot;, &quot;dend &quot;: &quot;30nov19 &quot;} } <br>
+                            <br>
+                            <strong>Raspuns prelucrat:</strong>
+                            <br>
+                            <br>
+                            <div style="max-width:1200px;overflow-x:scroll">
+                                <table class="params resp">
+                                    <thead>
+                                        <tr>
+                                            <th>Date</th>
+                                            <th>OpType</th>
+                                            <th>Symbol</th>
+                                            <th>Quantity</th>
+                                            <th>Price</th>
+                                            <th>Comission</th>
+                                            <th>Ammount</th>
+                                            <th>CashPos</th>
+                                            <th>InstrPos</th>
+                                            <th>Profit</th>
+                                            <th>TranzNo</th>
+                                            <th>Ccy</th>
+                                            <th>Obs</th>
+                                            <th>AvgPrice</th>
+                                            <th>OrderId</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <tr>
+                                            <td>2019-10-07T17:25:27.980Z</td>
+                                            <td>Buy</td>
+                                            <td>CEON</td>
+                                            <td>10000</td>
+                                            <td>0.355</td>
+                                            <td>17.75</td>
+                                            <td>-3569.88</td>
+                                            <td>16622.18513999999</td>
+                                            <td>10000</td>
+                                            <td>0</td>
+                                            <td>90127891</td>
+                                            <td>RON</td>
+                                            <td>null</td>
+                                            <td>0.356988</td>
+                                            <td>312672</td>
+                                        </tr>
+                                        <tr>
+                                            <td>2019-10-07T17:25:10.767Z</td>
+                                            <td>Buy</td>
+                                            <td>AAG</td>
+                                            <td>5000</td>
+                                            <td>2.98</td>
+                                            <td>74.5</td>
+                                            <td>-14983.44</td>
+                                            <td>20192.06513999999</td>
+                                            <td>5003</td>
+                                            <td>0</td>
+                                            <td>90127890</td>
+                                            <td>RON</td>
+                                            <td>null</td>
+                                            <td>2.99668799920048</td>
+                                            <td>312671</td>
+                                        </tr>
+                                        <tr>
+                                            <td>2019-10-07T17:24:48.183Z</td>
+                                            <td>Buy</td>
+                                            <td>AAG</td>
+                                            <td>3</td>
+                                            <td>2.98</td>
+                                            <td>0.0447</td>
+                                            <td>-8.99006</td>
+                                            <td>35175.505139999994</td>
+                                            <td>3</td>
+                                            <td>0</td>
+                                            <td>90127889</td>
+                                            <td>RON</td>
+                                            <td>null</td>
+                                            <td>2.9966866666666667</td>
+                                            <td>312670</td>
+                                        </tr>
+                                        <tr>
+                                            <td>2019-10-07T17:24:31.130Z</td>
+                                            <td>Buy</td>
+                                            <td>PREB</td>
+                                            <td>5000</td>
+                                            <td>0.61</td>
+                                            <td>15.25</td>
+                                            <td>-3067.08</td>
+                                            <td>35184.49519999999</td>
+                                            <td>5000</td>
+                                            <td>0</td>
+                                            <td>90127888</td>
+                                            <td>RON</td>
+                                            <td>null</td>
+                                            <td>0.613416</td>
+                                            <td>312669</td>
+                                        </tr>
+                                        <tr>
+                                            <td>2019-10-07T17:24:14.130Z</td>
+                                            <td>Buy</td>
+                                            <td>SNP</td>
+                                            <td>10000</td>
+                                            <td>0.4155</td>
+                                            <td>20.775</td>
+                                            <td>-4178.268</td>
+                                            <td>38251.57519999999</td>
+                                            <td>10000</td>
+                                            <td>0</td>
+                                            <td>90127887</td>
+                                            <td>RON</td>
+                                            <td>null</td>
+                                            <td>0.4178268</td>
+                                            <td>312668</td>
+                                        </tr>
+                                        <tr>
+                                            <td>2019-10-07T17:23:57.897Z</td>
+                                            <td>Buy</td>
+                                            <td>BRD</td>
+                                            <td>100</td>
+                                            <td>14.28</td>
+                                            <td>7.14</td>
+                                            <td>-1435.9968000000001</td>
+                                            <td>42429.843199999996</td>
+                                            <td>100</td>
+                                            <td>0</td>
+                                            <td>90127886</td>
+                                            <td>RON</td>
+                                            <td>null</td>
+                                            <td>14.359968000000002</td>
+                                            <td>312667</td>
+                                        </tr>
+                                        <tr>
+                                            <td>2019-10-07T17:23:37.407Z</td>
+                                            <td>Buy</td>
+                                            <td>PRSN</td>
+                                            <td>100000</td>
+                                            <td>0.061</td>
+                                            <td>30.5</td>
+                                            <td>-6134.16</td>
+                                            <td>43865.84</td>
+                                            <td>100000</td>
+                                            <td>0</td>
+                                            <td>90127885</td>
+                                            <td>RON</td>
+                                            <td>null</td>
+                                            <td>0.061341599999999996</td>
+                                            <td>312666</td>
+                                        </tr>
+                                        <tr>
+                                            <td>2019-10-07T17:20:40.560Z</td>
+                                            <td>In</td>
+                                            <td>RON</td>
+                                            <td>50000</td>
+                                            <td>null</td>
+                                            <td>null</td>
+                                            <td>50000</td>
+                                            <td>50000</td>
+                                            <td>null</td>
+                                            <td>0</td>
+                                            <td></td>
+                                            <td>RON</td>
+                                            <td>transfer initial demo</td>
+                                            <td>null</td>
+                                            <td>null</td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                            <br>
+                            <br>
+                            <strong>Raspuns neprelucrat:</strong>
+                            <div id="searchs" class="anchor">
+                                <script>
+                                    var activity = {
+                                        Date: ["2019-10-07T17:25:27.980Z", "2019-10-07T17:25:10.767Z", "2019-10-07T17:24:48.183Z", "2019-10-07T17:24:31.130Z", "2019-10-07T17:24:14.130Z", "2019-10-07T17:23:57.897Z", "2019-10-07T17:23:37.407Z", "2019-10-07T17:20:40.560Z"],
+                                        OpType: ["Buy", "Buy", "Buy", "Buy", "Buy", "Buy", "Buy", "In"],
+                                        Symbol: ["CEON", "AAG", "AAG", "PREB", "SNP", "BRD", "PRSN", "RON"],
+                                        Quantity: [1e4, 5e3, 3, 5e3, 1e4, 100, 1e5, 5e4],
+                                        Price: [.355, 2.98, 2.98, .61, .4155, 14.28, .061, null],
+                                        Comission: [17.75, 74.5, .0447, 15.25, 20.775, 7.14, 30.5, null],
+                                        Ammount: [-3569.88, -14983.44, -8.99006, -3067.08, -4178.268, -1435.9968000000001, -6134.16, 5e4],
+                                        CashPos: [16622.18513999999, 20192.06513999999, 35175.505139999994, 35184.49519999999, 38251.57519999999, 42429.843199999996, 43865.84, 5e4],
+                                        InstrPos: [1e4, 5003, 3, 5e3, 1e4, 100, 1e5, null],
+                                        Profit: [0, 0, 0, 0, 0, 0, 0, 0],
+                                        TranzNo: ["90127891", "90127890", "90127889", "90127888", "90127887", "90127886", "90127885", ""],
+                                        Ccy: ["RON", "RON", "RON", "RON", "RON", "RON", "RON", "RON"],
+                                        Obs: [null, null, null, null, null, null, null, "transfer initial demo"],
+                                        AvgPrice: [.356988, 2.99668799920048, 2.9966866666666667, .613416, .4178268, 14.359968000000002, .061341599999999996, null],
+                                        OrderId: [312672, 312671, 312670, 312669, 312668, 312667, 312666, null]
+                                    };
+                                    document.getElementById("searchs").appendChild(renderjson(activity))
+                                </script>
+                            </div>
+                            <br>
+                            <br>
+                            <strong>Comanda SearchSymbol</strong>
+                            <br>
+                            <br>
+                            <u>Descriere</u>
+                            : Returneaza date despre simbolurile care contin termenul cautarii in denumire <br>
+                            <br>
+                            Parametri acceptati: <br>
+                            <br>
+                            <table class="params">
+                                <thead>
+                                    <tr>
+                                        <th>Nume parametru</th>
+                                        <th>Tip parametru</th>
+                                        <th>Optional/Obligatoriu</th>
+                                        <th class="last">Descriere</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr>
+                                        <td class="name">
+                                            <code>search</code>
+                                        </td>
+                                        <td class="type">
+                                            <span class="param-type">String</span>
+                                        </td>
+                                        <td class="required">Obligatoriu</td>
+                                        <td class="description last">
+                                            <p>Termenul cautarii</p>
+                                        </td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                            <br>
+                            <strong>Exemplu comanda:</strong>
+                            { &quot;cmd &quot;: &quot;SearchSymbol &quot;, &quot;prm &quot;: { &quot;search &quot;: &quot;electric &quot;} } <br>
+                            <br>
+                            <strong>Raspuns prelucrat:</strong>
+                            <br>
+                            <br>
+                            <table class="params resp">
+                                <thead>
+                                    <tr>
+                                        <th>Symbol</th>
+                                        <th>Name</th>
+                                        <th>ISIN</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr>
+                                        <td>SNN</td>
+                                        <td>S.N. NUCLEARELECTRICA S.A.</td>
+                                        <td>ROSNNEACNOR8</td>
+                                    </tr>
+                                    <tr>
+                                        <td>TEL</td>
+                                        <td>C.N.T.E.E. TRANSELECTRICA</td>
+                                        <td>ROTSELACNOR9</td>
+                                    </tr>
+                                    <tr>
+                                        <td>EL</td>
+                                        <td>SOCIETATEA ENERGETICA ELECTRICA S.A.</td>
+                                        <td>ROELECACNOR5</td>
+                                    </tr>
+                                    <tr>
+                                        <td>US.GE</td>
+                                        <td>General Electric Company</td>
+                                        <td>US3696041033</td>
+                                    </tr>
+                                    <tr>
+                                        <td>FR.EDF</td>
+                                        <td>Electricite de France SA</td>
+                                        <td>FR0010242511</td>
+                                    </tr>
+                                    <tr>
+                                        <td>RCEL21L1</td>
+                                        <td>Call Warrant on Electrica SA</td>
+                                        <td>AT0000A2GTV9</td>
+                                    </tr>
+                                    <tr>
+                                        <td>FR.SU</td>
+                                        <td>Schneider Electric S.E. </td>
+                                        <td>FR0000121972</td>
+                                    </tr>
+                                    <tr>
+                                        <td>US.HE</td>
+                                        <td>Hawaiian Electric Industries, Inc.</td>
+                                        <td>US4198701009</td>
+                                    </tr>
+                                    <tr>
+                                        <td>ES.REE</td>
+                                        <td>Red Electrica de Espana</td>
+                                        <td>ES0173093024</td>
+                                    </tr>
+                                    <tr>
+                                        <td>US.EMR</td>
+                                        <td>Emerson Electric Company</td>
+                                        <td>US2910111044</td>
+                                    </tr>
+                                    <tr>
+                                        <td>US.GE2</td>
+                                        <td>LEVERAGE SHARES PUBLIC LIMITED COMPANY LEVERAGE SHARES 2X GENERAL ELECTRIC ETP</td>
+                                        <td>IE00BF03XQ02</td>
+                                    </tr>
+                                    <tr>
+                                        <td>US.KEP</td>
+                                        <td>Korea Electric Power Corporation </td>
+                                        <td>US5006311063</td>
+                                    </tr>
+                                    <tr>
+                                        <td>US.PCG</td>
+                                        <td>Pacific Gas & Electric Co.</td>
+                                        <td>US69331C1080</td>
+                                    </tr>
+                                    <tr>
+                                        <td>DE.IEVD</td>
+                                        <td>iShares Electric Vehicles and Driving Technology UCITS ETF</td>
+                                        <td>IE00BGL86Z12</td>
+                                    </tr>
+                                    <tr>
+                                        <td>FR.EDFl</td>
+                                        <td>Electricite de France SA LOYALTY BONUS 2022</td>
+                                        <td>FR0013459351</td>
+                                    </tr>
+                                    <tr>
+                                        <td>RCELTL1</td>
+                                        <td>TURBO LONG ON ELECTRICA SA</td>
+                                        <td>AT0000A2GU01</td>
+                                    </tr>
+                                    <tr>
+                                        <td>US.ELSA</td>
+                                        <td>Electrica SA (GDR)</td>
+                                        <td>US83367Y2072</td>
+                                    </tr>
+                                    <tr>
+                                        <td>US.MIELY</td>
+                                        <td>Mitsubishi Electric Corp. ADR</td>
+                                        <td>US6067762012</td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                            <br>
+                            <br>
+                            <strong>Raspuns neprelucrat:</strong>
+                            <div id="orders" class="anchor">
+                                <script>
+                                    var searchs = {
+                                        Symbol: ["SNN", "EL", "TEL", "US.GE", "FR.EDF", "RCEL21L1", "FR.SU", "US.HE", "ES.REE", "US.EMR", "US.GE2", "US.KEP", "US.PCG", "DE.IEVD", "FR.EDFl", "RCELTL1", "US.ELSA", "US.MIELY"],
+                                        Name: ["S.N. NUCLEARELECTRICA S.A.", "SOCIETATEA ENERGETICA ELECTRICA S.A.", "C.N.T.E.E. TRANSELECTRICA", "General Electric Company", "Electricite de France SA", "Call Warrant on Electrica SA", "Schneider Electric S.E. ", "Hawaiian Electric Industries, Inc.", "Red Electrica de Espana", "Emerson Electric Company", "LEVERAGE SHARES PUBLIC LIMITED COMPANY LEVERAGE SHARES 2X GENERAL ELECTRIC ETP", "Korea Electric Power Corporation ", "Pacific Gas & Electric Co.", "iShares Electric Vehicles and Driving Technology UCITS ETF", "Electricite de France SA LOYALTY BONUS 2022", "TURBO LONG ON ELECTRICA SA", "Electrica SA (GDR)", "Mitsubishi Electric Corp. ADR"],
+                                        ISIN: ["ROSNNEACNOR8", "ROELECACNOR5", "ROTSELACNOR9", "US3696041033", "FR0010242511", "AT0000A2GTV9", "FR0000121972", "US4198701009", "ES0173093024", "US2910111044", "IE00BF03XQ02", "US5006311063", "US69331C1080", "IE00BGL86Z12", "FR0013459351", "AT0000A2GU01", "US83367Y2072", "US6067762012"]
+                                    };
+                                    document.getElementById("orders").appendChild(renderjson(searchs))
+                                </script>
+                            </div>
+                            <br>
+                            <br>
+                            <strong>Comanda Orders</strong>
+                            <br>
+                            <br>
+                            <u>Descriere</u>
+                            : Returneaza oridinele pe un anumit simbol (daca este specificat un simbol), incepand cu o anumita data (daca este specificata o data) <br>
+                            <br>
+                            Parametri acceptati: <br>
+                            <br>
+                            <table class="params">
+                                <thead>
+                                    <tr>
+                                        <th>Nume parametru</th>
+                                        <th>Tip parametru</th>
+                                        <th>Optional/Obligatoriu</th>
+                                        <th class="last">Descriere</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr>
+                                        <td class="name">
+                                            <code>symbol</code>
+                                        </td>
+                                        <td class="type">
+                                            <span class="param-type">String</span>
+                                        </td>
+                                        <td class="required">Obligatoriu</td>
+                                        <td class="description last">
+                                            <p>Simbolul solicitat</p>
+                                        </td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                            <br>
+                            <strong>Exemplu comanda:</strong>
+                            { &quot;cmd &quot;: &quot;Symbol &quot;, &quot;prm &quot;: { &quot;symbol &quot;: &quot;BRD &quot;} } <br>
+                            <br>
+                            <strong>Raspuns prelucrat:</strong>
+                            <br>
+                            <br>
+                            <div>
+                                <table class="params resp">
+                                    <thead>
+                                        <tr>
+                                            <th>Symbol</th>
+                                            <th>Date</th>
+                                            <th>Price</th>
+                                            <th>Volume</th>
+                                            <th>Trades</th>
+                                            <th>Agres</th>
+                                            <th>BidQ</th>
+                                            <th>Bid</th>
+                                            <th>Ask</th>
+                                            <th>AskQ</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <tr>
+                                            <td>BRD</td>
+                                            <td>2019-10-16T10:00:00.513Z</td>
+                                            <td>14.18</td>
+                                            <td>50</td>
+                                            <td>1</td>
+                                            <td>4</td>
+                                            <td>121</td>
+                                            <td>14.16</td>
+                                            <td>14.18</td>
+                                            <td>1300</td>
+                                        </tr>
+                                        <tr>
+                                            <td>BRD</td>
+                                            <td>2019-10-16T10:06:46.297Z</td>
+                                            <td>14.18</td>
+                                            <td>1300</td>
+                                            <td>1</td>
+                                            <td>1</td>
+                                            <td>121</td>
+                                            <td>14.16</td>
+                                            <td>14.22</td>
+                                            <td>2000</td>
+                                        </tr>
+                                        <tr>
+                                            <td>BRD</td>
+                                            <td>2019-10-16T10:18:11.007Z</td>
+                                            <td>14.2</td>
+                                            <td>316</td>
+                                            <td>1</td>
+                                            <td>1</td>
+                                            <td>1000</td>
+                                            <td>14.18</td>
+                                            <td>14.2</td>
+                                            <td>1684</td>
+                                        </tr>
+                                        <tr>
+                                            <td>BRD</td>
+                                            <td>2019-10-16T10:22:25.817Z</td>
+                                            <td>14.2</td>
+                                            <td>60</td>
+                                            <td>1</td>
+                                            <td>1</td>
+                                            <td>1000</td>
+                                            <td>14.18</td>
+                                            <td>14.2</td>
+                                            <td>1624</td>
+                                        </tr>
+                                        <tr>
+                                            <td>BRD</td>
+                                            <td>2019-10-16T10:23:23.850Z</td>
+                                            <td>14.2</td>
+                                            <td>50</td>
+                                            <td>1</td>
+                                            <td>1</td>
+                                            <td>1000</td>
+                                            <td>14.18</td>
+                                            <td>14.2</td>
+                                            <td>1574</td>
+                                        </tr>
+                                        <tr>
+                                            <td>BRD</td>
+                                            <td>2019-10-16T11:17:32.030Z</td>
+                                            <td>14.18</td>
+                                            <td>1240</td>
+                                            <td>3</td>
+                                            <td>2</td>
+                                            <td>12860</td>
+                                            <td>14.18</td>
+                                            <td>14.2</td>
+                                            <td>1574</td>
+                                        </tr>
+                                        <tr>
+                                            <td>BRD</td>
+                                            <td>2019-10-16T11:57:12.220Z</td>
+                                            <td>14.2</td>
+                                            <td>25</td>
+                                            <td>1</td>
+                                            <td>1</td>
+                                            <td>13092</td>
+                                            <td>14.18</td>
+                                            <td>14.2</td>
+                                            <td>1549</td>
+                                        </tr>
+                                        <tr>
+                                            <td>BRD</td>
+                                            <td>2019-10-16T12:40:20.300Z</td>
+                                            <td>14.18</td>
+                                            <td>200000</td>
+                                            <td>4</td>
+                                            <td>2</td>
+                                            <td>23092</td>
+                                            <td>14.18</td>
+                                            <td>14.2</td>
+                                            <td>1549</td>
+                                        </tr>
+                                        <tr>
+                                            <td>BRD</td>
+                                            <td>2019-10-16T12:42:50.277Z</td>
+                                            <td>14.2</td>
+                                            <td>100</td>
+                                            <td>1</td>
+                                            <td>1</td>
+                                            <td>23092</td>
+                                            <td>14.18</td>
+                                            <td>14.2</td>
+                                            <td>1449</td>
+                                        </tr>
+                                        <tr>
+                                            <td>BRD</td>
+                                            <td>2019-10-16T13:36:32.647Z</td>
+                                            <td>14.18</td>
+                                            <td>20000</td>
+                                            <td>1</td>
+                                            <td>2</td>
+                                            <td>4092</td>
+                                            <td>14.18</td>
+                                            <td>14.2</td>
+                                            <td>1469</td>
+                                        </tr>
+                                        <tr>
+                                            <td>BRD</td>
+                                            <td>2019-10-16T13:44:01.557Z</td>
+                                            <td>14.18</td>
+                                            <td>2500</td>
+                                            <td>1</td>
+                                            <td>2</td>
+                                            <td>1592</td>
+                                            <td>14.18</td>
+                                            <td>14.2</td>
+                                            <td>1469</td>
+                                        </tr>
+                                        <tr>
+                                            <td>BRD</td>
+                                            <td>2019-10-16T13:44:38.603Z</td>
+                                            <td>14.18</td>
+                                            <td>1500</td>
+                                            <td>2</td>
+                                            <td>2</td>
+                                            <td>92</td>
+                                            <td>14.18</td>
+                                            <td>14.2</td>
+                                            <td>1469</td>
+                                        </tr>
+                                        <tr>
+                                            <td>BRD</td>
+                                            <td>2019-10-16T14:29:17.727Z</td>
+                                            <td>14.2</td>
+                                            <td>20</td>
+                                            <td>1</td>
+                                            <td>1</td>
+                                            <td>1</td>
+                                            <td>14.2</td>
+                                            <td>14.22</td>
+                                            <td>2512</td>
+                                        </tr>
+                                        <tr>
+                                            <td>BRD</td>
+                                            <td>2019-10-16T14:29:17.730Z</td>
+                                            <td>14.22</td>
+                                            <td>1</td>
+                                            <td>1</td>
+                                            <td>1</td>
+                                            <td>107</td>
+                                            <td>14.18</td>
+                                            <td>14.22</td>
+                                            <td>2511</td>
+                                        </tr>
+                                        <tr>
+                                            <td>BRD</td>
+                                            <td>2019-10-16T15:16:17.057Z</td>
+                                            <td>14.18</td>
+                                            <td>107</td>
+                                            <td>2</td>
+                                            <td>2</td>
+                                            <td>131</td>
+                                            <td>14.16</td>
+                                            <td>14.18</td>
+                                            <td>493</td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                            <br>
+                            <br>
+                            <strong>Raspuns neprelucrat:</strong>
+                            <div id="simbool" class="anchor">
+                                <script>
+                                    var orders = {
+                                        OrderId: ["A312673"],
+                                        Symbol: ["AAG"],
+                                        Status: ["S"],
+                                        TrdStatus: ["suspendat"],
+                                        Date: ["2019-10-07T18:17:00.493Z"],
+                                        OpType: ["Buy"],
+                                        ActiveQty: [1],
+                                        Quantity: [1],
+                                        Price: [1.5],
+                                        NetPrice: [null],
+                                        NewPrice: [null]
+                                    };
+                                    document.getElementById("simbool").appendChild(renderjson(orders))
+                                </script>
+                            </div>
+                            <br>
+                            <br>
+                            <strong>Comanda Symbol</strong>
+                            <br>
+                            <br>
+                            <u>Descriere</u>
+                            : Returneaza datele principale ale unui simbol. In functie de tipul simbolului (actiune/obligatiune/structurat), unele coloane sunt sau nu disponibile (e.g. StrikePrice) <br>
+                            <br>
+                            Parametri acceptati: <br>
+                            <br>
+                            <table class="params">
+                                <thead>
+                                    <tr>
+                                        <th>Nume parametru</th>
+                                        <th>Tip parametru</th>
+                                        <th>Optional/Obligatoriu</th>
+                                        <th class="last">Descriere</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr>
+                                        <td class="name">
+                                            <code>symbol</code>
+                                        </td>
+                                        <td class="type">
+                                            <span class="param-type">String</span>
+                                        </td>
+                                        <td class="required">Obligatoriu</td>
+                                        <td class="description last">
+                                            <p>Simbolul solicitat</p>
+                                        </td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                            <br>
+                            <strong>Exemplu comanda:</strong>
+                            { &quot;cmd &quot;: &quot;Symbol &quot;, &quot;prm &quot;: { &quot;symbol &quot;: &quot;BRD &quot;} } <br>
+                            <br>
+                            <strong>Raspuns prelucrat:</strong>
+                            <br>
+                            <br>
+                            <div style="max-width:1200px;overflow-x:scroll">
+                                <table class="params resp">
+                                    <thead>
+                                        <tr>
+                                            <th>Symbol</th>
+                                            <th>Price</th>
+                                            <th>RefPrice</th>
+                                            <th>BidQ</th>
+                                            <th>Bid</th>
+                                            <th>Ask</th>
+                                            <th>AskQ</th>
+                                            <th>DayVolume</th>
+                                            <th>DayValue</th>
+                                            <th>DayMin</th>
+                                            <th>DayMax</th>
+                                            <th>LimitDown</th>
+                                            <th>LimitUp</th>
+                                            <th>Status</th>
+                                            <th>Market</th>
+                                            <th>Ccy</th>
+                                            <th>ComputedPrice</th>
+                                            <th>Leverage</th>
+                                            <th>Barrier</th>
+                                            <th>StrikePrice</th>
+                                            <th>curat_formula</th>
+                                            <th>Dirty</th>
+                                            <th>CouponY</th>
+                                            <th>YTM</th>
+                                            <th>CouponDate</th>
+                                            <th>FinalDate</th>
+                                            <th>ISIN</th>
+                                            <th>FixPrice</th>
+                                            <th>FixVolume</th>
+                                            <th>Name</th>
+                                            <th>Dividend</th>
+                                            <th>DivPrice</th>
+                                            <th>Earnings</th>
+                                            <th>EarnDate</th>
+                                            <th>SharesNr</th>
+                                            <th>StatusM</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <tr>
+                                            <td>BRD</td>
+                                            <td>14.08</td>
+                                            <td>14.44</td>
+                                            <td>9844</td>
+                                            <td>14.08</td>
+                                            <td>14.12</td>
+                                            <td>600</td>
+                                            <td>665636</td>
+                                            <td>9393097</td>
+                                            <td>14</td>
+                                            <td>14.420000076293945</td>
+                                            <td>10.83</td>
+                                            <td>18.05</td>
+                                            <td>Closed</td>
+                                            <td>(BVB) REGS</td>
+                                            <td>RON</td>
+                                            <td>null</td>
+                                            <td>null</td>
+                                            <td>null</td>
+                                            <td>null</td>
+                                            <td>null</td>
+                                            <td>null</td>
+                                            <td>null</td>
+                                            <td>null</td>
+                                            <td>null</td>
+                                            <td>null</td>
+                                            <td>ROBRDBACNOR2</td>
+                                            <td>0</td>
+                                            <td>0</td>
+                                            <td>BRD - Groupe Societe Generale</td>
+                                            <td>null</td>
+                                            <td>null</td>
+                                            <td>962857000</td>
+                                            <td>2020-12-31</td>
+                                            <td>696901518</td>
+                                            <td>Ready</td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                            <br>
+                            <br>
+                            <strong>Raspuns neprelucrat:</strong>
+                            <div id="level2" class="anchor">
+                                <script>
+                                    var simbool = {
+                                        Symbol: ["BRD"],
+                                        Price: [14.46],
+                                        RefPrice: [14.8],
+                                        BidQ: [3264],
+                                        Bid: [14.44],
+                                        Ask: [14.46],
+                                        AskQ: [155],
+                                        DayVolume: ["336937"],
+                                        DayValue: [4849228.5],
+                                        DayMin: [14],
+                                        DayMax: [14.680000305175781],
+                                        LimitDown: [11.1001],
+                                        LimitUp: [18.5],
+                                        Status: ["Opened"],
+                                        Market: ["(BVB) REGS"],
+                                        Ccy: ["RON"],
+                                        ComputedPrice: [null],
+                                        Leverage: [null],
+                                        Barrier: [null],
+                                        StrikePrice: [null],
+                                        curat_formula: [null],
+                                        Dirty: [null],
+                                        CouponY: [null],
+                                        YTM: [null],
+                                        CouponDate: [null],
+                                        FinalDate: [null],
+                                        ISIN: ["ROBRDBACNOR2"],
+                                        FixPrice: [0],
+                                        FixVolume: [0],
+                                        Name: ["BRD - Groupe Societe Generale"],
+                                        Dividend: [null],
+                                        DivPrice: [null],
+                                        Earnings: [962857e3],
+                                        EarnDate: ["2020-12-31"],
+                                        SharesNr: [696901518],
+                                        StatusM: ["Ready"]
+                                    };
+                                    document.getElementById("level2").appendChild(renderjson(simbool))
+                                </script>
+                            </div>
+                            <br>
+                            <br>
+                            <strong>Comanda Level2</strong>
+                            <br>
+                            <br>
+                            <u>Descriere</u>
+                            : Returneaza adancimea de piata a unui simbol. <br>
+                            <br>
+                            Parametri acceptati: <br>
+                            <br>
+                            <table class="params">
+                                <thead>
+                                    <tr>
+                                        <th>Nume parametru</th>
+                                        <th>Tip parametru</th>
+                                        <th>Optional/Obligatoriu</th>
+                                        <th class="last">Descriere</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr>
+                                        <td class="name">
+                                            <code>symbol</code>
+                                        </td>
+                                        <td class="type">
+                                            <span class="param-type">String</span>
+                                        </td>
+                                        <td class="required">Obligatoriu</td>
+                                        <td class="description last">
+                                            <p>Simbolul solicitat</p>
+                                        </td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                            <br>
+                            <strong>Exemplu comanda:</strong>
+                            { &quot;cmd &quot;: &quot;Level2 &quot;, &quot;prm &quot;: { &quot;symbol &quot;: &quot;BRD &quot;, &quot;levels &quot;: 10 } } <br>
+                            <br>
+                            <strong>Raspuns prelucrat:</strong>
+                            <br>
+                            <br>
+                            <table class="params resp">
+                                <thead>
+                                    <tr>
+                                        <th>BidNo</th>
+                                        <th>BidQ</th>
+                                        <th>Bid</th>
+                                        <th>Ask</th>
+                                        <th>AskQ</th>
+                                        <th>AskNo</th>
+                                        <th>BidH</th>
+                                        <th>AskH</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr>
+                                        <td>2</td>
+                                        <td>9844</td>
+                                        <td>14.08</td>
+                                        <td>14.12</td>
+                                        <td>600</td>
+                                        <td>2</td>
+                                        <td></td>
+                                        <td></td>
+                                    </tr>
+                                    <tr>
+                                        <td>5</td>
+                                        <td>10470</td>
+                                        <td>14.02</td>
+                                        <td>14.14</td>
+                                        <td>4600</td>
+                                        <td>4</td>
+                                        <td></td>
+                                        <td></td>
+                                    </tr>
+                                    <tr>
+                                        <td>39</td>
+                                        <td>41040</td>
+                                        <td>14</td>
+                                        <td>14.16</td>
+                                        <td>5000</td>
+                                        <td>1</td>
+                                        <td>1H1000</td>
+                                        <td></td>
+                                    </tr>
+                                    <tr>
+                                        <td>6</td>
+                                        <td>460</td>
+                                        <td>13.98</td>
+                                        <td>14.18</td>
+                                        <td>3045</td>
+                                        <td>2</td>
+                                        <td></td>
+                                        <td></td>
+                                    </tr>
+                                    <tr>
+                                        <td>3</td>
+                                        <td>135</td>
+                                        <td>13.96</td>
+                                        <td>14.2</td>
+                                        <td>12424</td>
+                                        <td>4</td>
+                                        <td></td>
+                                        <td></td>
+                                    </tr>
+                                    <tr>
+                                        <td>2</td>
+                                        <td>1022</td>
+                                        <td>13.94</td>
+                                        <td>14.24</td>
+                                        <td>302</td>
+                                        <td>2</td>
+                                        <td></td>
+                                        <td></td>
+                                    </tr>
+                                    <tr>
+                                        <td>4</td>
+                                        <td>2740</td>
+                                        <td>13.92</td>
+                                        <td>14.26</td>
+                                        <td>240</td>
+                                        <td>2</td>
+                                        <td></td>
+                                        <td></td>
+                                    </tr>
+                                    <tr>
+                                        <td>11</td>
+                                        <td>3185</td>
+                                        <td>13.9</td>
+                                        <td>14.3</td>
+                                        <td>4521</td>
+                                        <td>4</td>
+                                        <td></td>
+                                        <td></td>
+                                    </tr>
+                                    <tr>
+                                        <td>1</td>
+                                        <td>50</td>
+                                        <td>13.88</td>
+                                        <td>14.38</td>
+                                        <td>300</td>
+                                        <td>2</td>
+                                        <td></td>
+                                        <td></td>
+                                    </tr>
+                                    <tr>
+                                        <td>1</td>
+                                        <td>1001</td>
+                                        <td>13.84</td>
+                                        <td>14.4</td>
+                                        <td>49514</td>
+                                        <td>7</td>
+                                        <td></td>
+                                        <td></td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                            <br>
+                            <br>
+                            <strong>Raspuns neprelucrat:</strong>
+                            <div id="daily" class="anchor">
+                                <script>
+                                    var level2 = {
+                                        BidNo: [2, 2, 1, 1, 3, 5, 3, 15, 8, 5],
+                                        BidQ: [3264, 1242, 29, 50, 5337, 14113, 1123, 3561, 2026, 15982],
+                                        Bid: [14.44, 14.42, 14.4, 14.38, 14.36, 14.34, 14.32, 14.3, 14.28, 14.26],
+                                        Ask: [14.48, 14.5, 14.52, 14.54, 14.56, 14.58, 14.6, 14.62, 14.66, 14.68],
+                                        AskQ: [4519, 12440, 1166, 825, 463, 766, 4173, 546, 10550, 15295],
+                                        AskNo: [9, 6, 2, 1, 3, 4, 4, 2, 3, 4],
+                                        BidH: ["", "", "", "", "", "", "", "", "", ""],
+                                        AskH: ["", "", "", "", "", "", "", "", "", ""]
+                                    };
+                                    document.getElementById("daily").appendChild(renderjson(level2))
+                                </script>
+                            </div>
+                            <br>
+                            <br>
+                            <strong>Comanda DailyValues</strong>
+                            <br>
+                            <br>
+                            <u>Descriere</u>
+                            : Returneaza valorile zilnice ale simbolului, in perioada selectata <br>
+                            <br>
+                            Parametri acceptati: <br>
+                            <br>
+                            <table class="params">
+                                <thead>
+                                    <tr>
+                                        <th>Nume parametru</th>
+                                        <th>Tip parametru</th>
+                                        <th>Optional/Obligatoriu</th>
+                                        <th class="last">Descriere</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr>
+                                        <td class="name">
+                                            <code>symbol</code>
+                                        </td>
+                                        <td class="type">
+                                            <span class="param-type">String</span>
+                                        </td>
+                                        <td class="required">Optional</td>
+                                        <td class="description last">
+                                            <p>Simbolul solicitat (poate fi null daca intervalul este de doar o zi, caz in care arata tot)</p>
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td class="name">
+                                            <code>dstart</code>
+                                        </td>
+                                        <td class="type">
+                                            <span class="param-type">Date</span>
+                                        </td>
+                                        <td class="required">Obligatoriu</td>
+                                        <td class="description last">
+                                            <p>Data de inceput a perioadei</p>
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td class="name">
+                                            <code>dend</code>
+                                        </td>
+                                        <td class="type">
+                                            <span class="param-type">Date</span>
+                                        </td>
+                                        <td class="required">Obligatoriu</td>
+                                        <td class="description last">
+                                            <p>Data de sfarsit a perioadei</p>
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td class="name">
+                                            <code>adj</code>
+                                        </td>
+                                        <td class="type">
+                                            <span class="param-type">Integer</span>
+                                        </td>
+                                        <td class="required">Optional</td>
+                                        <td class="description last">
+                                            <p>Ajustat cu split / consolidari / fuziuni (fara dividende)</p>
+                                        </td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                            <br>
+                            <strong>Exemplu comanda:</strong>
+                            { &quot;cmd &quot;: &quot;DailyValues &quot;, &quot;prm &quot;: { &quot;symbol &quot;: &quot;BRD &quot;, &quot;dstart &quot;: &quot;1nov20 &quot;, &quot;dend &quot;: &quot;20nov20 &quot;, &quot;adj &quot;: &quot;1 &quot;: } } <br>
+                            <br>
+                            <strong>Raspuns prelucrat:</strong>
+                            <br>
+                            <br>
+                            <table class="params resp">
+                                <thead>
+                                    <tr>
+                                        <th>Symbol</th>
+                                        <th>Date</th>
+                                        <th>Open</th>
+                                        <th>Low</th>
+                                        <th>High</th>
+                                        <th>Close</th>
+                                        <th>Volume</th>
+                                        <th>Value</th>
+                                        <th>Trades</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr>
+                                        <td>BRD</td>
+                                        <td>2020-11-02</td>
+                                        <td>11.42</td>
+                                        <td>11.42</td>
+                                        <td>12</td>
+                                        <td>11.72</td>
+                                        <td>116600</td>
+                                        <td>1362861.58</td>
+                                        <td>122</td>
+                                    </tr>
+                                    <tr>
+                                        <td>BRD</td>
+                                        <td>2020-11-03</td>
+                                        <td>11.76</td>
+                                        <td>11.76</td>
+                                        <td>12.04</td>
+                                        <td>12.04</td>
+                                        <td>71969</td>
+                                        <td>859163.94</td>
+                                        <td>105</td>
+                                    </tr>
+                                    <tr>
+                                        <td>BRD</td>
+                                        <td>2020-11-04</td>
+                                        <td>12.06</td>
+                                        <td>11.88</td>
+                                        <td>12.24</td>
+                                        <td>12.24</td>
+                                        <td>57774</td>
+                                        <td>698487.28</td>
+                                        <td>78</td>
+                                    </tr>
+                                    <tr>
+                                        <td>BRD</td>
+                                        <td>2020-11-05</td>
+                                        <td>12.28</td>
+                                        <td>12.28</td>
+                                        <td>12.44</td>
+                                        <td>12.42</td>
+                                        <td>50309</td>
+                                        <td>623576.34</td>
+                                        <td>89</td>
+                                    </tr>
+                                    <tr>
+                                        <td>BRD</td>
+                                        <td>2020-11-06</td>
+                                        <td>12.36</td>
+                                        <td>12.1</td>
+                                        <td>12.42</td>
+                                        <td>12.2</td>
+                                        <td>118636</td>
+                                        <td>1462560.22</td>
+                                        <td>105</td>
+                                    </tr>
+                                    <tr>
+                                        <td>BRD</td>
+                                        <td>2020-11-09</td>
+                                        <td>12.4</td>
+                                        <td>12.4</td>
+                                        <td>12.82</td>
+                                        <td>12.82</td>
+                                        <td>103810</td>
+                                        <td>1317483.54</td>
+                                        <td>221</td>
+                                    </tr>
+                                    <tr>
+                                        <td>BRD</td>
+                                        <td>2020-11-10</td>
+                                        <td>12.94</td>
+                                        <td>12.62</td>
+                                        <td>13.1</td>
+                                        <td>13</td>
+                                        <td>217364</td>
+                                        <td>2820620.58</td>
+                                        <td>286</td>
+                                    </tr>
+                                    <tr>
+                                        <td>BRD</td>
+                                        <td>2020-11-11</td>
+                                        <td>13</td>
+                                        <td>12.82</td>
+                                        <td>13.06</td>
+                                        <td>12.86</td>
+                                        <td>347339</td>
+                                        <td>4493795.4</td>
+                                        <td>145</td>
+                                    </tr>
+                                    <tr>
+                                        <td>BRD</td>
+                                        <td>2020-11-12</td>
+                                        <td>12.76</td>
+                                        <td>12.6</td>
+                                        <td>12.86</td>
+                                        <td>12.6</td>
+                                        <td>267216</td>
+                                        <td>3386946.08</td>
+                                        <td>116</td>
+                                    </tr>
+                                    <tr>
+                                        <td>BRD</td>
+                                        <td>2020-11-13</td>
+                                        <td>12.68</td>
+                                        <td>12.4</td>
+                                        <td>12.68</td>
+                                        <td>12.4</td>
+                                        <td>170851</td>
+                                        <td>2132234.86</td>
+                                        <td>123</td>
+                                    </tr>
+                                    <tr>
+                                        <td>BRD</td>
+                                        <td>2020-11-16</td>
+                                        <td>12.62</td>
+                                        <td>12.4</td>
+                                        <td>12.72</td>
+                                        <td>12.5</td>
+                                        <td>162735</td>
+                                        <td>2034448.34</td>
+                                        <td>114</td>
+                                    </tr>
+                                    <tr>
+                                        <td>BRD</td>
+                                        <td>2020-11-17</td>
+                                        <td>12.52</td>
+                                        <td>12.44</td>
+                                        <td>12.64</td>
+                                        <td>12.46</td>
+                                        <td>478239</td>
+                                        <td>5996272.74</td>
+                                        <td>81</td>
+                                    </tr>
+                                    <tr>
+                                        <td>BRD</td>
+                                        <td>2020-11-18</td>
+                                        <td>12.58</td>
+                                        <td>12.46</td>
+                                        <td>12.58</td>
+                                        <td>12.46</td>
+                                        <td>161027</td>
+                                        <td>2014102.6</td>
+                                        <td>44</td>
+                                    </tr>
+                                    <tr>
+                                        <td>BRD</td>
+                                        <td>2020-11-19</td>
+                                        <td>12.5</td>
+                                        <td>12.48</td>
+                                        <td>12.6</td>
+                                        <td>12.52</td>
+                                        <td>177831</td>
+                                        <td>2225741.16</td>
+                                        <td>74</td>
+                                    </tr>
+                                    <tr>
+                                        <td>BRD</td>
+                                        <td>2020-11-20</td>
+                                        <td>12.6</td>
+                                        <td>12.6</td>
+                                        <td>12.78</td>
+                                        <td>12.78</td>
+                                        <td>1102136</td>
+                                        <td>13953995.84</td>
+                                        <td>71</td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                            <br>
+                            <br>
+                            <strong>Raspuns neprelucrat:</strong>
+                            <div id="trades" class="anchor">
+                                <script>
+                                    var daily = {
+                                        Symbol: ["BRD", "BRD", "BRD", "BRD", "BRD", "BRD", "BRD", "BRD", "BRD", "BRD", "BRD", "BRD", "BRD", "BRD", "BRD"],
+                                        Date: ["2020-11-02", "2020-11-03", "2020-11-04", "2020-11-05", "2020-11-06", "2020-11-09", "2020-11-10", "2020-11-11", "2020-11-12", "2020-11-13", "2020-11-16", "2020-11-17", "2020-11-18", "2020-11-19", "2020-11-20"],
+                                        Open: [11.42, 11.76, 12.06, 12.28, 12.36, 12.4, 12.94, 13, 12.76, 12.68, 12.62, 12.52, 12.58, 12.5, 12.6],
+                                        Low: [11.42, 11.76, 11.88, 12.28, 12.1, 12.4, 12.62, 12.82, 12.6, 12.4, 12.4, 12.44, 12.46, 12.48, 12.6],
+                                        High: [12, 12.04, 12.24, 12.44, 12.42, 12.82, 13.1, 13.06, 12.86, 12.68, 12.72, 12.64, 12.58, 12.6, 12.78],
+                                        Close: [11.72, 12.04, 12.24, 12.42, 12.2, 12.82, 13, 12.86, 12.6, 12.4, 12.5, 12.46, 12.46, 12.52, 12.78],
+                                        Volume: [116600, 71969, 57774, 50309, 118636, 103810, 217364, 347339, 267216, 170851, 162735, 478239, 161027, 177831, 1102136],
+                                        Value: [1362861.58, 859163.94, 698487.28, 623576.34, 1462560.22, 1317483.54, 2820620.58, 4493795.4, 3386946.08, 2132234.86, 2034448.34, 5996272.74, 2014102.6, 2225741.16, 13953995.84],
+                                        Trades: [122, 105, 78, 89, 105, 221, 286, 145, 116, 123, 114, 81, 44, 74, 71]
+                                    };
+                                    document.getElementById("trades").appendChild(renderjson(daily))
+                                </script>
+                            </div>
+                            <br>
+                            <br>
+                            <strong>Comanda Trades</strong>
+                            <br>
+                            <br>
+                            <u>Descriere</u>
+                            : Returneaza toate tranzactiile efectuate pe un simbol, intr-un anumit interval <br>
+                            <br>
+                            Parametri acceptati: <br>
+                            <br>
+                            <table class="params">
+                                <thead>
+                                    <tr>
+                                        <th>Nume parametru</th>
+                                        <th>Tip parametru</th>
+                                        <th>Optional/Obligatoriu</th>
+                                        <th class="last">Descriere</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr>
+                                        <td class="name">
+                                            <code>symbol</code>
+                                        </td>
+                                        <td class="type">
+                                            <span class="param-type">String</span>
+                                        </td>
+                                        <td class="required">Optional</td>
+                                        <td class="description last">
+                                            <p>Simbolul solicitat (poate fi null daca intervalul este de doar o zi, caz in care arata tranzactiile de pe toate simbolurile)</p>
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td class="name">
+                                            <code>dstart</code>
+                                        </td>
+                                        <td class="type">
+                                            <span class="param-type">Date</span>
+                                        </td>
+                                        <td class="required">Obligatoriu</td>
+                                        <td class="description last">
+                                            <p>Data de inceput a perioadei</p>
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td class="name">
+                                            <code>dend</code>
+                                        </td>
+                                        <td class="type">
+                                            <span class="param-type">Date</span>
+                                        </td>
+                                        <td class="required">Obligatoriu</td>
+                                        <td class="description last">
+                                            <p>Data de sfarsit a perioadei</p>
+                                        </td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                            <br>
+                            <strong>Exemplu comanda:</strong>
+                            { &quot;cmd &quot;: &quot;Trades &quot;, &quot;prm &quot;: { &quot;symbol &quot;: &quot;BRD &quot;, &quot;dstart &quot;: &quot;16oct19 &quot;, &quot;dend &quot;: &quot;20oct19 &quot;} } <br>
+                            <br>
+                            <strong>Raspuns prelucrat:</strong>
+                            <br>
+                            <br>
+                            <table class="params resp">
+                                <thead>
+                                    <tr>
+                                        <th>Symbol</th>
+                                        <th>Date</th>
+                                        <th>Price</th>
+                                        <th>Volume</th>
+                                        <th>Trades</th>
+                                        <th>Agres</th>
+                                        <th>BidQ</th>
+                                        <th>Bid</th>
+                                        <th>Ask</th>
+                                        <th>AskQ</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr>
+                                        <td>BRD</td>
+                                        <td>2019-10-16T10:00:00.513Z</td>
+                                        <td>14.18</td>
+                                        <td>50</td>
+                                        <td>1</td>
+                                        <td>4</td>
+                                        <td>121</td>
+                                        <td>14.16</td>
+                                        <td>14.18</td>
+                                        <td>1300</td>
+                                    </tr>
+                                    <tr>
+                                        <td>BRD</td>
+                                        <td>2019-10-16T10:06:46.297Z</td>
+                                        <td>14.18</td>
+                                        <td>1300</td>
+                                        <td>1</td>
+                                        <td>1</td>
+                                        <td>121</td>
+                                        <td>14.16</td>
+                                        <td>14.22</td>
+                                        <td>2000</td>
+                                    </tr>
+                                    <tr>
+                                        <td>BRD</td>
+                                        <td>2019-10-16T10:18:11.007Z</td>
+                                        <td>14.2</td>
+                                        <td>316</td>
+                                        <td>1</td>
+                                        <td>1</td>
+                                        <td>1000</td>
+                                        <td>14.18</td>
+                                        <td>14.2</td>
+                                        <td>1684</td>
+                                    </tr>
+                                    <tr>
+                                        <td>BRD</td>
+                                        <td>2019-10-16T10:22:25.817Z</td>
+                                        <td>14.2</td>
+                                        <td>60</td>
+                                        <td>1</td>
+                                        <td>1</td>
+                                        <td>1000</td>
+                                        <td>14.18</td>
+                                        <td>14.2</td>
+                                        <td>1624</td>
+                                    </tr>
+                                    <tr>
+                                        <td>BRD</td>
+                                        <td>2019-10-16T10:23:23.850Z</td>
+                                        <td>14.2</td>
+                                        <td>50</td>
+                                        <td>1</td>
+                                        <td>1</td>
+                                        <td>1000</td>
+                                        <td>14.18</td>
+                                        <td>14.2</td>
+                                        <td>1574</td>
+                                    </tr>
+                                    <tr>
+                                        <td>BRD</td>
+                                        <td>2019-10-16T11:17:32.030Z</td>
+                                        <td>14.18</td>
+                                        <td>1240</td>
+                                        <td>3</td>
+                                        <td>2</td>
+                                        <td>12860</td>
+                                        <td>14.18</td>
+                                        <td>14.2</td>
+                                        <td>1574</td>
+                                    </tr>
+                                    <tr>
+                                        <td>BRD</td>
+                                        <td>2019-10-16T11:57:12.220Z</td>
+                                        <td>14.2</td>
+                                        <td>25</td>
+                                        <td>1</td>
+                                        <td>1</td>
+                                        <td>13092</td>
+                                        <td>14.18</td>
+                                        <td>14.2</td>
+                                        <td>1549</td>
+                                    </tr>
+                                    <tr>
+                                        <td>BRD</td>
+                                        <td>2019-10-16T12:40:20.300Z</td>
+                                        <td>14.18</td>
+                                        <td>200000</td>
+                                        <td>4</td>
+                                        <td>2</td>
+                                        <td>23092</td>
+                                        <td>14.18</td>
+                                        <td>14.2</td>
+                                        <td>1549</td>
+                                    </tr>
+                                    <tr>
+                                        <td>BRD</td>
+                                        <td>2019-10-16T12:42:50.277Z</td>
+                                        <td>14.2</td>
+                                        <td>100</td>
+                                        <td>1</td>
+                                        <td>1</td>
+                                        <td>23092</td>
+                                        <td>14.18</td>
+                                        <td>14.2</td>
+                                        <td>1449</td>
+                                    </tr>
+                                    <tr>
+                                        <td>BRD</td>
+                                        <td>2019-10-16T13:36:32.647Z</td>
+                                        <td>14.18</td>
+                                        <td>20000</td>
+                                        <td>1</td>
+                                        <td>2</td>
+                                        <td>4092</td>
+                                        <td>14.18</td>
+                                        <td>14.2</td>
+                                        <td>1469</td>
+                                    </tr>
+                                    <tr>
+                                        <td>BRD</td>
+                                        <td>2019-10-16T13:44:01.557Z</td>
+                                        <td>14.18</td>
+                                        <td>2500</td>
+                                        <td>1</td>
+                                        <td>2</td>
+                                        <td>1592</td>
+                                        <td>14.18</td>
+                                        <td>14.2</td>
+                                        <td>1469</td>
+                                    </tr>
+                                    <tr>
+                                        <td>BRD</td>
+                                        <td>2019-10-16T13:44:38.603Z</td>
+                                        <td>14.18</td>
+                                        <td>1500</td>
+                                        <td>2</td>
+                                        <td>2</td>
+                                        <td>92</td>
+                                        <td>14.18</td>
+                                        <td>14.2</td>
+                                        <td>1469</td>
+                                    </tr>
+                                    <tr>
+                                        <td>BRD</td>
+                                        <td>2019-10-16T14:29:17.727Z</td>
+                                        <td>14.2</td>
+                                        <td>20</td>
+                                        <td>1</td>
+                                        <td>1</td>
+                                        <td>1</td>
+                                        <td>14.2</td>
+                                        <td>14.22</td>
+                                        <td>2512</td>
+                                    </tr>
+                                    <tr>
+                                        <td>BRD</td>
+                                        <td>2019-10-16T14:29:17.730Z</td>
+                                        <td>14.22</td>
+                                        <td>1</td>
+                                        <td>1</td>
+                                        <td>1</td>
+                                        <td>107</td>
+                                        <td>14.18</td>
+                                        <td>14.22</td>
+                                        <td>2511</td>
+                                    </tr>
+                                    <tr>
+                                        <td>BRD</td>
+                                        <td>2019-10-16T15:16:17.057Z</td>
+                                        <td>14.18</td>
+                                        <td>107</td>
+                                        <td>2</td>
+                                        <td>2</td>
+                                        <td>131</td>
+                                        <td>14.16</td>
+                                        <td>14.18</td>
+                                        <td>493</td>
+                                    </tr>
+                                    <tr>
+                                        <td>BRD</td>
+                                        <td>2019-10-16T15:19:41.323Z</td>
+                                        <td>14.18</td>
+                                        <td>170</td>
+                                        <td>1</td>
+                                        <td>1</td>
+                                        <td>131</td>
+                                        <td>14.16</td>
+                                        <td>14.18</td>
+                                        <td>323</td>
+                                    </tr>
+                                    <tr>
+                                        <td>BRD</td>
+                                        <td>2019-10-16T15:25:39.197Z</td>
+                                        <td>14.18</td>
+                                        <td>50</td>
+                                        <td>1</td>
+                                        <td>1</td>
+                                        <td>281</td>
+                                        <td>14.16</td>
+                                        <td>14.18</td>
+                                        <td>273</td>
+                                    </tr>
+                                    <tr>
+                                        <td>BRD</td>
+                                        <td>2019-10-16T15:29:42.650Z</td>
+                                        <td>14.16</td>
+                                        <td>281</td>
+                                        <td>5</td>
+                                        <td>2</td>
+                                        <td>1215</td>
+                                        <td>14.14</td>
+                                        <td>14.14</td>
+                                        <td>24</td>
+                                    </tr>
+                                    <tr>
+                                        <td>BRD</td>
+                                        <td>2019-10-16T15:29:42.653Z</td>
+                                        <td>14.14</td>
+                                        <td>24</td>
+                                        <td>1</td>
+                                        <td>2</td>
+                                        <td>1191</td>
+                                        <td>14.14</td>
+                                        <td>14.18</td>
+                                        <td>273</td>
+                                    </tr>
+                                    <tr>
+                                        <td>BRD</td>
+                                        <td>2019-10-16T15:32:39.773Z</td>
+                                        <td>14.16</td>
+                                        <td>100</td>
+                                        <td>1</td>
+                                        <td>1</td>
+                                        <td>5</td>
+                                        <td>14.16</td>
+                                        <td>14.18</td>
+                                        <td>273</td>
+                                    </tr>
+                                    <tr>
+                                        <td>BRD</td>
+                                        <td>2019-10-16T15:46:23.060Z</td>
+                                        <td>14.18</td>
+                                        <td>273</td>
+                                        <td>1</td>
+                                        <td>1</td>
+                                        <td>2727</td>
+                                        <td>14.18</td>
+                                        <td>14.2</td>
+                                        <td>1050</td>
+                                    </tr>
+                                    <tr>
+                                        <td>BRD</td>
+                                        <td>2019-10-16T15:50:51.747Z</td>
+                                        <td>14.2</td>
+                                        <td>10</td>
+                                        <td>1</td>
+                                        <td>1</td>
+                                        <td>2727</td>
+                                        <td>14.18</td>
+                                        <td>14.2</td>
+                                        <td>1040</td>
+                                    </tr>
+                                    <tr>
+                                        <td>BRD</td>
+                                        <td>2019-10-16T16:07:25.540Z</td>
+                                        <td>14.2</td>
+                                        <td>410</td>
+                                        <td>1</td>
+                                        <td>1</td>
+                                        <td>2727</td>
+                                        <td>14.18</td>
+                                        <td>14.2</td>
+                                        <td>630</td>
+                                    </tr>
+                                    <tr>
+                                        <td>BRD</td>
+                                        <td>2019-10-16T17:29:12.130Z</td>
+                                        <td>14.2</td>
+                                        <td>600</td>
+                                        <td>2</td>
+                                        <td>1</td>
+                                        <td>3227</td>
+                                        <td>14.18</td>
+                                        <td>14.2</td>
+                                        <td>30</td>
+                                    </tr>
+                                    <tr>
+                                        <td>BRD</td>
+                                        <td>2019-10-16T17:50:00.217Z</td>
+                                        <td>14.22</td>
+                                        <td>11000</td>
+                                        <td>5</td>
+                                        <td>4</td>
+                                        <td>840</td>
+                                        <td>14.2</td>
+                                        <td>14.22</td>
+                                        <td>792</td>
+                                    </tr>
+                                    <tr>
+                                        <td>BRD</td>
+                                        <td>2019-10-16T17:50:41.137Z</td>
+                                        <td>14.22</td>
+                                        <td>830</td>
+                                        <td>4</td>
+                                        <td>1</td>
+                                        <td>3427</td>
+                                        <td>14.18</td>
+                                        <td>14.22</td>
+                                        <td>2462</td>
+                                    </tr>
+                                    <tr>
+                                        <td>BRD</td>
+                                        <td>2019-10-16T17:58:17.537Z</td>
+                                        <td>14.22</td>
+                                        <td>2462</td>
+                                        <td>1</td>
+                                        <td>1</td>
+                                        <td>704</td>
+                                        <td>14.22</td>
+                                        <td>14.26</td>
+                                        <td>3671</td>
+                                    </tr>
+                                    <tr>
+                                        <td>BRD</td>
+                                        <td>2019-10-17T10:31:10.027Z</td>
+                                        <td>14.2</td>
+                                        <td>50</td>
+                                        <td>1</td>
+                                        <td>2</td>
+                                        <td>750</td>
+                                        <td>14.18</td>
+                                        <td>14.2</td>
+                                        <td>3020</td>
+                                    </tr>
+                                    <tr>
+                                        <td>BRD</td>
+                                        <td>2019-10-17T10:42:47.077Z</td>
+                                        <td>14.18</td>
+                                        <td>750</td>
+                                        <td>2</td>
+                                        <td>2</td>
+                                        <td>700</td>
+                                        <td>14.16</td>
+                                        <td>14.18</td>
+                                        <td>150</td>
+                                    </tr>
+                                    <tr>
+                                        <td>BRD</td>
+                                        <td>2019-10-17T11:02:22.760Z</td>
+                                        <td>14.18</td>
+                                        <td>1100</td>
+                                        <td>2</td>
+                                        <td>1</td>
+                                        <td>7715</td>
+                                        <td>14.16</td>
+                                        <td>14.18</td>
+                                        <td>50</td>
+                                    </tr>
+                                    <tr>
+                                        <td>BRD</td>
+                                        <td>2019-10-17T11:06:48.680Z</td>
+                                        <td>14.18</td>
+                                        <td>5</td>
+                                        <td>1</td>
+                                        <td>1</td>
+                                        <td>7715</td>
+                                        <td>14.16</td>
+                                        <td>14.18</td>
+                                        <td>45</td>
+                                    </tr>
+                                    <tr>
+                                        <td>BRD</td>
+                                        <td>2019-10-17T11:12:09.380Z</td>
+                                        <td>14.18</td>
+                                        <td>45</td>
+                                        <td>1</td>
+                                        <td>1</td>
+                                        <td>155</td>
+                                        <td>14.18</td>
+                                        <td>14.2</td>
+                                        <td>3020</td>
+                                    </tr>
+                                    <tr>
+                                        <td>BRD</td>
+                                        <td>2019-10-17T11:22:47.700Z</td>
+                                        <td>14.2</td>
+                                        <td>2300</td>
+                                        <td>1</td>
+                                        <td>1</td>
+                                        <td>155</td>
+                                        <td>14.18</td>
+                                        <td>14.2</td>
+                                        <td>720</td>
+                                    </tr>
+                                    <tr>
+                                        <td>BRD</td>
+                                        <td>2019-10-17T11:42:15.283Z</td>
+                                        <td>14.2</td>
+                                        <td>720</td>
+                                        <td>1</td>
+                                        <td>1</td>
+                                        <td>364</td>
+                                        <td>14.2</td>
+                                        <td>14.26</td>
+                                        <td>3671</td>
+                                    </tr>
+                                    <tr>
+                                        <td>BRD</td>
+                                        <td>2019-10-17T13:06:42.870Z</td>
+                                        <td>14.2</td>
+                                        <td>996</td>
+                                        <td>2</td>
+                                        <td>2</td>
+                                        <td>7155</td>
+                                        <td>14.18</td>
+                                        <td>14.2</td>
+                                        <td>904</td>
+                                    </tr>
+                                    <tr>
+                                        <td>BRD</td>
+                                        <td>2019-10-17T13:38:46.677Z</td>
+                                        <td>14.2</td>
+                                        <td>904</td>
+                                        <td>1</td>
+                                        <td>1</td>
+                                        <td>96</td>
+                                        <td>14.2</td>
+                                        <td>14.24</td>
+                                        <td>407</td>
+                                    </tr>
+                                    <tr>
+                                        <td>BRD</td>
+                                        <td>2019-10-17T14:05:31.687Z</td>
+                                        <td>14.24</td>
+                                        <td>20</td>
+                                        <td>1</td>
+                                        <td>1</td>
+                                        <td>4823</td>
+                                        <td>14.2</td>
+                                        <td>14.24</td>
+                                        <td>387</td>
+                                    </tr>
+                                    <tr>
+                                        <td>BRD</td>
+                                        <td>2019-10-17T14:38:01.997Z</td>
+                                        <td>14.24</td>
+                                        <td>70</td>
+                                        <td>1</td>
+                                        <td>1</td>
+                                        <td>5823</td>
+                                        <td>14.2</td>
+                                        <td>14.24</td>
+                                        <td>317</td>
+                                    </tr>
+                                    <tr>
+                                        <td>BRD</td>
+                                        <td>2019-10-17T15:35:17.500Z</td>
+                                        <td>14.2</td>
+                                        <td>400</td>
+                                        <td>2</td>
+                                        <td>2</td>
+                                        <td>6423</td>
+                                        <td>14.2</td>
+                                        <td>14.24</td>
+                                        <td>317</td>
+                                    </tr>
+                                    <tr>
+                                        <td>BRD</td>
+                                        <td>2019-10-17T16:08:35.093Z</td>
+                                        <td>14.24</td>
+                                        <td>20</td>
+                                        <td>1</td>
+                                        <td>1</td>
+                                        <td>8423</td>
+                                        <td>14.2</td>
+                                        <td>14.24</td>
+                                        <td>349</td>
+                                    </tr>
+                                    <tr>
+                                        <td>BRD</td>
+                                        <td>2019-10-17T16:21:35.457Z</td>
+                                        <td>14.24</td>
+                                        <td>279</td>
+                                        <td>1</td>
+                                        <td>1</td>
+                                        <td>1000</td>
+                                        <td>14.22</td>
+                                        <td>14.24</td>
+                                        <td>70</td>
+                                    </tr>
+                                    <tr>
+                                        <td>BRD</td>
+                                        <td>2019-10-17T16:23:31.687Z</td>
+                                        <td>14.22</td>
+                                        <td>1000</td>
+                                        <td>1</td>
+                                        <td>2</td>
+                                        <td>7423</td>
+                                        <td>14.2</td>
+                                        <td>14.22</td>
+                                        <td>1483</td>
+                                    </tr>
+                                    <tr>
+                                        <td>BRD</td>
+                                        <td>2019-10-17T16:24:08.423Z</td>
+                                        <td>14.2</td>
+                                        <td>1483</td>
+                                        <td>1</td>
+                                        <td>2</td>
+                                        <td>5940</td>
+                                        <td>14.2</td>
+                                        <td>14.24</td>
+                                        <td>70</td>
+                                    </tr>
+                                    <tr>
+                                        <td>BRD</td>
+                                        <td>2019-10-17T16:31:35.067Z</td>
+                                        <td>14.24</td>
+                                        <td>2</td>
+                                        <td>1</td>
+                                        <td>1</td>
+                                        <td>6040</td>
+                                        <td>14.2</td>
+                                        <td>14.24</td>
+                                        <td>68</td>
+                                    </tr>
+                                    <tr>
+                                        <td>BRD</td>
+                                        <td>2019-10-17T16:39:04.507Z</td>
+                                        <td>14.2</td>
+                                        <td>2705</td>
+                                        <td>2</td>
+                                        <td>2</td>
+                                        <td>3335</td>
+                                        <td>14.2</td>
+                                        <td>14.24</td>
+                                        <td>68</td>
+                                    </tr>
+                                    <tr>
+                                        <td>BRD</td>
+                                        <td>2019-10-17T16:40:34.300Z</td>
+                                        <td>14.24</td>
+                                        <td>50</td>
+                                        <td>2</td>
+                                        <td>1</td>
+                                        <td>3335</td>
+                                        <td>14.2</td>
+                                        <td>14.24</td>
+                                        <td>18</td>
+                                    </tr>
+                                    <tr>
+                                        <td>BRD</td>
+                                        <td>2019-10-17T16:42:04.673Z</td>
+                                        <td>14.24</td>
+                                        <td>18</td>
+                                        <td>1</td>
+                                        <td>1</td>
+                                        <td>82</td>
+                                        <td>14.26</td>
+                                        <td>14.26</td>
+                                        <td>2064</td>
+                                    </tr>
+                                    <tr>
+                                        <td>BRD</td>
+                                        <td>2019-10-17T16:42:04.673Z</td>
+                                        <td>14.26</td>
+                                        <td>82</td>
+                                        <td>1</td>
+                                        <td>1</td>
+                                        <td>26</td>
+                                        <td>14.22</td>
+                                        <td>14.26</td>
+                                        <td>1982</td>
+                                    </tr>
+                                    <tr>
+                                        <td>BRD</td>
+                                        <td>2019-10-17T17:08:39.757Z</td>
+                                        <td>14.22</td>
+                                        <td>76</td>
+                                        <td>2</td>
+                                        <td>2</td>
+                                        <td>3335</td>
+                                        <td>14.2</td>
+                                        <td>14.12</td>
+                                        <td>9264</td>
+                                    </tr>
+                                    <tr>
+                                        <td>BRD</td>
+                                        <td>2019-10-17T17:08:39.763Z</td>
+                                        <td>14.2</td>
+                                        <td>3335</td>
+                                        <td>4</td>
+                                        <td>2</td>
+                                        <td>7180</td>
+                                        <td>14.18</td>
+                                        <td>14.12</td>
+                                        <td>5929</td>
+                                    </tr>
+                                    <tr>
+                                        <td>BRD</td>
+                                        <td>2019-10-17T17:08:39.767Z</td>
+                                        <td>14.18</td>
+                                        <td>5929</td>
+                                        <td>2</td>
+                                        <td>2</td>
+                                        <td>1251</td>
+                                        <td>14.18</td>
+                                        <td>14.24</td>
+                                        <td>500</td>
+                                    </tr>
+                                    <tr>
+                                        <td>BRD</td>
+                                        <td>2019-10-17T17:10:08.833Z</td>
+                                        <td>14.24</td>
+                                        <td>5</td>
+                                        <td>1</td>
+                                        <td>1</td>
+                                        <td>1251</td>
+                                        <td>14.18</td>
+                                        <td>14.24</td>
+                                        <td>495</td>
+                                    </tr>
+                                    <tr>
+                                        <td>BRD</td>
+                                        <td>2019-10-17T17:37:20.647Z</td>
+                                        <td>14.24</td>
+                                        <td>495</td>
+                                        <td>1</td>
+                                        <td>1</td>
+                                        <td>5</td>
+                                        <td>14.26</td>
+                                        <td>14.26</td>
+                                        <td>1982</td>
+                                    </tr>
+                                    <tr>
+                                        <td>BRD</td>
+                                        <td>2019-10-17T17:37:20.650Z</td>
+                                        <td>14.26</td>
+                                        <td>5</td>
+                                        <td>1</td>
+                                        <td>1</td>
+                                        <td>60</td>
+                                        <td>14.2</td>
+                                        <td>14.26</td>
+                                        <td>1977</td>
+                                    </tr>
+                                    <tr>
+                                        <td>BRD</td>
+                                        <td>2019-10-17T17:50:00.347Z</td>
+                                        <td>14.3</td>
+                                        <td>4600</td>
+                                        <td>13</td>
+                                        <td>4</td>
+                                        <td>2460</td>
+                                        <td>14.2</td>
+                                        <td>14.3</td>
+                                        <td>4525</td>
+                                    </tr>
+                                    <tr>
+                                        <td>BRD</td>
+                                        <td>2019-10-18T10:28:56.113Z</td>
+                                        <td>14.3</td>
+                                        <td>10</td>
+                                        <td>1</td>
+                                        <td>1</td>
+                                        <td>460</td>
+                                        <td>14.2</td>
+                                        <td>14.3</td>
+                                        <td>8765</td>
+                                    </tr>
+                                    <tr>
+                                        <td>BRD</td>
+                                        <td>2019-10-18T11:34:52.230Z</td>
+                                        <td>14.3</td>
+                                        <td>5000</td>
+                                        <td>3</td>
+                                        <td>1</td>
+                                        <td>30</td>
+                                        <td>14.22</td>
+                                        <td>14.3</td>
+                                        <td>10772</td>
+                                    </tr>
+                                    <tr>
+                                        <td>BRD</td>
+                                        <td>2019-10-18T11:57:04.863Z</td>
+                                        <td>14.3</td>
+                                        <td>100</td>
+                                        <td>1</td>
+                                        <td>1</td>
+                                        <td>30</td>
+                                        <td>14.22</td>
+                                        <td>14.3</td>
+                                        <td>10672</td>
+                                    </tr>
+                                    <tr>
+                                        <td>BRD</td>
+                                        <td>2019-10-18T11:57:45.380Z</td>
+                                        <td>14.3</td>
+                                        <td>2800</td>
+                                        <td>1</td>
+                                        <td>1</td>
+                                        <td>30</td>
+                                        <td>14.22</td>
+                                        <td>14.3</td>
+                                        <td>7872</td>
+                                    </tr>
+                                    <tr>
+                                        <td>BRD</td>
+                                        <td>2019-10-18T14:29:51.307Z</td>
+                                        <td>14.3</td>
+                                        <td>21</td>
+                                        <td>1</td>
+                                        <td>1</td>
+                                        <td>2500</td>
+                                        <td>14.26</td>
+                                        <td>14.3</td>
+                                        <td>10013</td>
+                                    </tr>
+                                    <tr>
+                                        <td>BRD</td>
+                                        <td>2019-10-18T14:44:37.770Z</td>
+                                        <td>14.3</td>
+                                        <td>100</td>
+                                        <td>1</td>
+                                        <td>1</td>
+                                        <td>2500</td>
+                                        <td>14.26</td>
+                                        <td>14.3</td>
+                                        <td>11913</td>
+                                    </tr>
+                                    <tr>
+                                        <td>BRD</td>
+                                        <td>2019-10-18T15:07:09.410Z</td>
+                                        <td>14.26</td>
+                                        <td>3284</td>
+                                        <td>2</td>
+                                        <td>2</td>
+                                        <td>216</td>
+                                        <td>14.26</td>
+                                        <td>14.3</td>
+                                        <td>11913</td>
+                                    </tr>
+                                    <tr>
+                                        <td>BRD</td>
+                                        <td>2019-10-18T15:10:21.817Z</td>
+                                        <td>14.3</td>
+                                        <td>20</td>
+                                        <td>1</td>
+                                        <td>1</td>
+                                        <td>216</td>
+                                        <td>14.26</td>
+                                        <td>14.3</td>
+                                        <td>11893</td>
+                                    </tr>
+                                    <tr>
+                                        <td>BRD</td>
+                                        <td>2019-10-18T15:29:11.090Z</td>
+                                        <td>14.3</td>
+                                        <td>1</td>
+                                        <td>1</td>
+                                        <td>1</td>
+                                        <td>216</td>
+                                        <td>14.26</td>
+                                        <td>14.3</td>
+                                        <td>11892</td>
+                                    </tr>
+                                    <tr>
+                                        <td>BRD</td>
+                                        <td>2019-10-18T15:29:51.807Z</td>
+                                        <td>14.3</td>
+                                        <td>1</td>
+                                        <td>1</td>
+                                        <td>1</td>
+                                        <td>216</td>
+                                        <td>14.26</td>
+                                        <td>14.3</td>
+                                        <td>12448</td>
+                                    </tr>
+                                    <tr>
+                                        <td>BRD</td>
+                                        <td>2019-10-18T16:26:30.260Z</td>
+                                        <td>14.28</td>
+                                        <td>50</td>
+                                        <td>1</td>
+                                        <td>1</td>
+                                        <td>1930</td>
+                                        <td>14.22</td>
+                                        <td>14.28</td>
+                                        <td>350</td>
+                                    </tr>
+                                    <tr>
+                                        <td>BRD</td>
+                                        <td>2019-10-18T16:58:41.587Z</td>
+                                        <td>14.28</td>
+                                        <td>13</td>
+                                        <td>1</td>
+                                        <td>1</td>
+                                        <td>498</td>
+                                        <td>14.24</td>
+                                        <td>14.28</td>
+                                        <td>337</td>
+                                    </tr>
+                                    <tr>
+                                        <td>BRD</td>
+                                        <td>2019-10-18T17:41:19.713Z</td>
+                                        <td>14.28</td>
+                                        <td>337</td>
+                                        <td>1</td>
+                                        <td>1</td>
+                                        <td>111</td>
+                                        <td>14.28</td>
+                                        <td>14.3</td>
+                                        <td>8788</td>
+                                    </tr>
+                                    <tr>
+                                        <td>BRD</td>
+                                        <td>2019-10-18T17:50:00.397Z</td>
+                                        <td>14.16</td>
+                                        <td>16110</td>
+                                        <td>28</td>
+                                        <td>4</td>
+                                        <td>7964</td>
+                                        <td>14.16</td>
+                                        <td>14.28</td>
+                                        <td>2000</td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                            <br>
+                            <br>
+                            <strong>Raspuns neprelucrat:</strong>
+                            <div id="exemple" class="anchor">
+                                <script>
+                                    var trades = {
+                                        Symbol: ["BRD", "BRD", "BRD", "BRD", "BRD", "BRD", "BRD", "BRD", "BRD", "BRD", "BRD", "BRD", "BRD", "BRD", "BRD", "BRD", "BRD", "BRD", "BRD", "BRD", "BRD", "BRD", "BRD", "BRD", "BRD", "BRD", "BRD", "BRD", "BRD", "BRD", "BRD", "BRD", "BRD", "BRD", "BRD", "BRD", "BRD", "BRD", "BRD", "BRD", "BRD", "BRD", "BRD", "BRD", "BRD", "BRD", "BRD", "BRD", "BRD", "BRD", "BRD", "BRD", "BRD", "BRD", "BRD", "BRD", "BRD", "BRD", "BRD", "BRD", "BRD", "BRD", "BRD", "BRD", "BRD", "BRD", "BRD", "BRD", "BRD"],
+                                        Date: ["2019-10-16T10:00:00.513Z", "2019-10-16T10:06:46.297Z", "2019-10-16T10:18:11.007Z", "2019-10-16T10:22:25.817Z", "2019-10-16T10:23:23.850Z", "2019-10-16T11:17:32.030Z", "2019-10-16T11:57:12.220Z", "2019-10-16T12:40:20.300Z", "2019-10-16T12:42:50.277Z", "2019-10-16T13:36:32.647Z", "2019-10-16T13:44:01.557Z", "2019-10-16T13:44:38.603Z", "2019-10-16T14:29:17.727Z", "2019-10-16T14:29:17.730Z", "2019-10-16T15:16:17.057Z", "2019-10-16T15:19:41.323Z", "2019-10-16T15:25:39.197Z", "2019-10-16T15:29:42.650Z", "2019-10-16T15:29:42.653Z", "2019-10-16T15:32:39.773Z", "2019-10-16T15:46:23.060Z", "2019-10-16T15:50:51.747Z", "2019-10-16T16:07:25.540Z", "2019-10-16T17:29:12.130Z", "2019-10-16T17:50:00.217Z", "2019-10-16T17:50:41.137Z", "2019-10-16T17:58:17.537Z", "2019-10-17T10:31:10.027Z", "2019-10-17T10:42:47.077Z", "2019-10-17T11:02:22.760Z", "2019-10-17T11:06:48.680Z", "2019-10-17T11:12:09.380Z", "2019-10-17T11:22:47.700Z", "2019-10-17T11:42:15.283Z", "2019-10-17T13:06:42.870Z", "2019-10-17T13:38:46.677Z", "2019-10-17T14:05:31.687Z", "2019-10-17T14:38:01.997Z", "2019-10-17T15:35:17.500Z", "2019-10-17T16:08:35.093Z", "2019-10-17T16:21:35.457Z", "2019-10-17T16:23:31.687Z", "2019-10-17T16:24:08.423Z", "2019-10-17T16:31:35.067Z", "2019-10-17T16:39:04.507Z", "2019-10-17T16:40:34.300Z", "2019-10-17T16:42:04.673Z", "2019-10-17T16:42:04.673Z", "2019-10-17T17:08:39.757Z", "2019-10-17T17:08:39.763Z", "2019-10-17T17:08:39.767Z", "2019-10-17T17:10:08.833Z", "2019-10-17T17:37:20.647Z", "2019-10-17T17:37:20.650Z", "2019-10-17T17:50:00.347Z", "2019-10-18T10:28:56.113Z", "2019-10-18T11:34:52.230Z", "2019-10-18T11:57:04.863Z", "2019-10-18T11:57:45.380Z", "2019-10-18T14:29:51.307Z", "2019-10-18T14:44:37.770Z", "2019-10-18T15:07:09.410Z", "2019-10-18T15:10:21.817Z", "2019-10-18T15:29:11.090Z", "2019-10-18T15:29:51.807Z", "2019-10-18T16:26:30.260Z", "2019-10-18T16:58:41.587Z", "2019-10-18T17:41:19.713Z", "2019-10-18T17:50:00.397Z"],
+                                        Price: [14.18, 14.18, 14.2, 14.2, 14.2, 14.18, 14.2, 14.18, 14.2, 14.18, 14.18, 14.18, 14.2, 14.22, 14.18, 14.18, 14.18, 14.16, 14.14, 14.16, 14.18, 14.2, 14.2, 14.2, 14.22, 14.22, 14.22, 14.2, 14.18, 14.18, 14.18, 14.18, 14.2, 14.2, 14.2, 14.2, 14.24, 14.24, 14.2, 14.24, 14.24, 14.22, 14.2, 14.24, 14.2, 14.24, 14.24, 14.26, 14.22, 14.2, 14.18, 14.24, 14.24, 14.26, 14.3, 14.3, 14.3, 14.3, 14.3, 14.3, 14.3, 14.26, 14.3, 14.3, 14.3, 14.28, 14.28, 14.28, 14.16],
+                                        Volume: [50, 1300, 316, 60, 50, 1240, 25, 2e5, 100, 2e4, 2500, 1500, 20, 1, 107, 170, 50, 281, 24, 100, 273, 10, 410, 600, 11e3, 830, 2462, 50, 750, 1100, 5, 45, 2300, 720, 996, 904, 20, 70, 400, 20, 279, 1e3, 1483, 2, 2705, 50, 18, 82, 76, 3335, 5929, 5, 495, 5, 4600, 10, 5e3, 100, 2800, 21, 100, 3284, 20, 1, 1, 50, 13, 337, 16110],
+                                        Trades: [1, 1, 1, 1, 1, 3, 1, 4, 1, 1, 1, 2, 1, 1, 2, 1, 1, 5, 1, 1, 1, 1, 1, 2, 5, 4, 1, 1, 2, 2, 1, 1, 1, 1, 2, 1, 1, 1, 2, 1, 1, 1, 1, 1, 2, 2, 1, 1, 2, 4, 2, 1, 1, 1, 13, 1, 3, 1, 1, 1, 1, 2, 1, 1, 1, 1, 1, 1, 28],
+                                        Agres: [4, 1, 1, 1, 1, 2, 1, 2, 1, 2, 2, 2, 1, 1, 2, 1, 1, 2, 2, 1, 1, 1, 1, 1, 4, 1, 1, 2, 2, 1, 1, 1, 1, 1, 2, 1, 1, 1, 2, 1, 1, 2, 2, 1, 2, 1, 1, 1, 2, 2, 2, 1, 1, 1, 4, 1, 1, 1, 1, 1, 1, 2, 1, 1, 1, 1, 1, 1, 4],
+                                        BidQ: [121, 121, 1e3, 1e3, 1e3, 12860, 13092, 23092, 23092, 4092, 1592, 92, 1, 107, 131, 131, 281, 1215, 1191, 5, 2727, 2727, 2727, 3227, 840, 3427, 704, 750, 700, 7715, 7715, 155, 155, 364, 7155, 96, 4823, 5823, 6423, 8423, 1e3, 7423, 5940, 6040, 3335, 3335, 82, 26, 3335, 7180, 1251, 1251, 5, 60, 2460, 460, 30, 30, 30, 2500, 2500, 216, 216, 216, 216, 1930, 498, 111, 7964],
+                                        Bid: [14.16, 14.16, 14.18, 14.18, 14.18, 14.18, 14.18, 14.18, 14.18, 14.18, 14.18, 14.18, 14.2, 14.18, 14.16, 14.16, 14.16, 14.14, 14.14, 14.16, 14.18, 14.18, 14.18, 14.18, 14.2, 14.18, 14.22, 14.18, 14.16, 14.16, 14.16, 14.18, 14.18, 14.2, 14.18, 14.2, 14.2, 14.2, 14.2, 14.2, 14.22, 14.2, 14.2, 14.2, 14.2, 14.2, 14.26, 14.22, 14.2, 14.18, 14.18, 14.18, 14.26, 14.2, 14.2, 14.2, 14.22, 14.22, 14.22, 14.26, 14.26, 14.26, 14.26, 14.26, 14.26, 14.22, 14.24, 14.28, 14.16],
+                                        Ask: [14.18, 14.22, 14.2, 14.2, 14.2, 14.2, 14.2, 14.2, 14.2, 14.2, 14.2, 14.2, 14.22, 14.22, 14.18, 14.18, 14.18, 14.14, 14.18, 14.18, 14.2, 14.2, 14.2, 14.2, 14.22, 14.22, 14.26, 14.2, 14.18, 14.18, 14.18, 14.2, 14.2, 14.26, 14.2, 14.24, 14.24, 14.24, 14.24, 14.24, 14.24, 14.22, 14.24, 14.24, 14.24, 14.24, 14.26, 14.26, 14.12, 14.12, 14.24, 14.24, 14.26, 14.26, 14.3, 14.3, 14.3, 14.3, 14.3, 14.3, 14.3, 14.3, 14.3, 14.3, 14.3, 14.28, 14.28, 14.3, 14.28],
+                                        AskQ: [1300, 2e3, 1684, 1624, 1574, 1574, 1549, 1549, 1449, 1469, 1469, 1469, 2512, 2511, 493, 323, 273, 24, 273, 273, 1050, 1040, 630, 30, 792, 2462, 3671, 3020, 150, 50, 45, 3020, 720, 3671, 904, 407, 387, 317, 317, 349, 70, 1483, 70, 68, 68, 18, 2064, 1982, 9264, 5929, 500, 495, 1982, 1977, 4525, 8765, 10772, 10672, 7872, 10013, 11913, 11913, 11893, 11892, 12448, 350, 337, 8788, 2e3]
+                                    };
+                                    document.getElementById("exemple").appendChild(renderjson(trades))
+                                </script>
+                            </div>
+                            <br>
+                            <br>
+                        </table>
+                    </article>
+                </section>
+                <section>
+                    <div>
+                        <header id="JSexample" class="anchor">
+                            <h3>Exemplu Javascript</h3>
+                        </header>
+                        <article>
+                            Un exemplu interactiv implementat in Javascript/HTML se poate gasi la adresa de mai jos: <br>
+                            <br>
+                            <a href="api.htm" target="_blank">Exemplu Javascript</a>
+                        </article>
+                    </div>
+                    <br>
+                    <br>
+                    <br>
+                    <div>
+                        <header id="nodejs" class="anchor">
+                            <h3>Implementare NodeJS</h3>
+                        </header>
+                        <article>
+                            <strong>Exemplu generare portofoliu</strong>
+                            <p>instalati NODE de la nodejs.org;</p>
+                            <p>deschideti &quot;command prompt &quot;in folderul unde ati salvat fisierul acesta</p>
+                            <p>instalati modulul &quot;websocket &quot;ruland: npm install websocket</p>
+                            <p>rulati exemplul curent cu: node apitest</p>
+                            <p>Acesta este un model de implementare care va genera un csv continand portofoliul dvs.</p>
+                            <pre class="prettyprint source lang-javascript">
+                                <code>var WebSocket = require('websocket').w3cwebsocket;
+            var fs = require('fs');
+            var websocket;
+
+            function startws() {
+                websocket = new WebSocket(&quot;wss://api.tradeville.ro &quot;, [&quot;apitv &quot;]);
+                websocket.onopen = ()=>sendJS({cmd:'login',prm:{coduser:'!DemoAPITDV', parola:'DemoAPITDV', demo:true}});
+                websocket.onerror = (err)=>console.log('eroare la conectare');
+                websocket.onmessage = mesajAPI;
+            }
+            startws();
+
+            function mesajAPI(evt) {
+                var ce;
+                try {ce=JSON.parse(evt.data)} catch (e) {}
+                if(!ce) return;
+                afiseaza(ce);
+            }
+            function sendJS(oo){
+                if(websocket.readyState!=1) {afiseaza('fara conexiune la server'); return;}
+                websocket.send(JSON.stringify(oo));
+            }
+
+            function afiseaza(ce={}){
+                if(ce.prm) delete ce.prm.parola;
+                if(ce.cmd=='Portfolio') {
+                    fs.writeFileSync('portofoliu.csv', data2tabel(ce.data));
+                    console.log('am creat/modificat fisierul portofoliu.csv');
+                    process.exit();
+                }
+                console.log(ce);
+                if(ce.cmd=='login') {
+                    if(ce.OK) sendJS({cmd:'Portfolio',prm:{data:null}}); else process.exit();
+                }
+            }
+
+            function data2tabel(dd){
+                if(Array.isArray(dd)){let st='';dd.forEach(a=>st+=data2tabel(a)); return st;}
+                let ss='', c1=dd[Object.keys(dd)[0]];
+                for(let k in dd) ss+=(ss?',':'')+k;
+                ss+='\r\n'; if(!Array.isArray(c1)) return c1;
+                c1.forEach((r,i)=>{
+                    let rr='';
+                    for(let k in dd) rr+=(rr?',':'')+dd[k][i];
+                    ss+=rr+'\r\n';
+                });
+                return ss;
+            }
+            </code>
+                            </pre>
+                        </article>
+                    </div>
+                    <div>
+                        <header id="python" class="anchor">
+                            <h3>Implementare python</h3>
+                        </header>
+                        <article>
+                            <strong>Exemplu de comenzi posibile</strong>
+                            <pre class="prettyprint source lang-javascript">
+                                <code>#!pip install websocket-client
+                import websocket
+                import time
+                try:
+                    import thread
+                except ImportError:
+                    import _thread as thread
+                import time
+
+                class MyWebSocket(object):
+                    def __init__(self):
+                        websocket.enableTrace(False)
+                        self.ws = create_connection(&quot;wss://api.tradeville.ro:443 &quot;, subprotocols=[&quot;apitv &quot;])
+                        self.ws.on_message = self.on_message
+                        self.ws.on_error = self.on_error
+                        self.ws.on_close = self.on_close
+                        self.ws.on_open = self.on_open
+                        self.ws.send('{&quot;cmd &quot;:&quot;login &quot;,&quot;prm &quot;:{&quot;coduser &quot;:&quot;!DemoAPITDV &quot;, &quot;parola &quot;:&quot;DemoAPITDV &quot;,&quot;demo &quot;: true }}')
+                        result = self.ws.recv()
+                        print(f &quot;Login result: {result}&quot;)
+
+
+                    def send_and_recived_message(self, message):
+                        self.ws.send(message)
+                        print(f &quot;Sent message: {message}.&quot;)
+                        result = self.ws.recv()
+                        print(f &quot;Received: {result}.\n &quot;)
+                        return result
+
+                    def wait_for_messages(self, noOfMessagesToWait):
+                        for i in range(noOfMessagesToWait):
+                            time.sleep(1)
+                            result = self.ws.recv()
+                            print(f &quot;Received message: {result}.\n &quot;)
+
+
+                    def send_message(self, message):
+                        self.ws.send(message)
+                        print(f &quot;Sent message: {message}.&quot;)
+
+                    def recived_message(self):
+                        result = self.ws.recv()
+                        print(f &quot;Received: {result}.\n &quot;)
+                        return result
+
+                    def close(self):
+                        print(&quot;Close connection &quot;)
+                        self.ws.close()
+
+
+                    def on_message(self, message):
+                        print(f &quot;Received message: {message}.&quot;)
+
+                    def on_error(self, error):
+                        print(f &quot;Received error: {error}.&quot;)
+
+                    def on_close(self):
+                        print(&quot;On close!&quot;)
+
+                    def on_open(self, ws):
+                        print(&quot;On open...&quot;)
+
+
+                if __name__ == &quot;__main__ &quot;:
+                    my_web_socket = MyWebSocket()
+                    print(&quot;\n &quot;)
+
+                    # GET PORTFOLIO HOLDINGS
+                    # Current Portfolio
+                    result = my_web_socket.send_and_recived_message('{ &quot;cmd &quot;: &quot;Portfolio &quot;, &quot;prm &quot;: { &quot;data &quot;: &quot;null &quot;} }')
+                    # Portfolio at specific date
+                    result = my_web_socket.send_and_recived_message('{ &quot;cmd &quot;: &quot;Portfolio &quot;, &quot;prm &quot;: { &quot;date &quot;: &quot;6oct19 &quot;} }')
+                    # BNR Official Currency Rates
+                    result = my_web_socket.send_and_recived_message('{ &quot;cmd &quot;: &quot;FXBNR &quot;, &quot;prm &quot;: { &quot;ccy &quot;: &quot;EUR &quot;, &quot;dstart &quot;: &quot;1oct20 &quot;, &quot;dend &quot;: &quot;5oct20 &quot;} }')
+
+                    # GET Activity
+                    result  = my_web_socket.send_and_recived_message('{ &quot;cmd &quot;: &quot;Activity &quot;, &quot;prm &quot;: { &quot;symbol &quot;: null, &quot;dstart &quot;: &quot;1oct19 &quot;, &quot;dend &quot;: &quot;30nov19 &quot;} }')
+
+                    # Get SymbolMarket Data
+                    result = my_web_socket.send_and_recived_message('{ &quot;cmd &quot;: &quot;SearchSymbol &quot;, &quot;prm &quot;: { &quot;search &quot;: &quot;electric &quot;} }')
+                    # Current Price & Details for specific symbol
+                    result = my_web_socket.send_and_recived_message('{ &quot;cmd &quot;: &quot;Symbol &quot;, &quot;prm &quot;: { &quot;symbol &quot;: &quot;BRD &quot;} }')
+                    # Market Depth for specific symbol
+                    result = my_web_socket.send_and_recived_message('{ &quot;cmd &quot;: &quot;Level2 &quot;, &quot;prm &quot;: { &quot;symbol &quot;: &quot;BRD &quot;} }')
+                    # Daily Values for specific symbol
+                    result = my_web_socket.send_and_recived_message('{ &quot;cmd &quot;: &quot;DailyValues &quot;, &quot;prm &quot;: { &quot;symbol &quot;: &quot;BRD &quot;, &quot;dstart &quot;: &quot;1nov20 &quot;, &quot;dend &quot;: &quot;20nov20 &quot;} }')
+                    # Transaction History for specific symbol
+                    result = my_web_socket.send_and_recived_message('{ &quot;cmd &quot;: &quot;Trades &quot;, &quot;prm &quot;: { &quot;symbol &quot;: &quot;BRD &quot;, &quot;dstart &quot;: &quot;1oct19 &quot;, &quot;dend &quot;: &quot;20oct19 &quot;} }')
+                    # Subscribe to market Quotes for specific symbol
+                    result = my_web_socket.send_and_recived_message('{ &quot;cmd &quot;: &quot;subscribe &quot;, &quot;sym &quot;: &quot;BRD &quot;, &quot;prm &quot;: {}, &quot;OK &quot;: 1 }')
+                    # Subscribe to market Quotes for a list of symbols
+                    result = my_web_socket.send_and_recived_message('{ &quot;cmd &quot;: &quot;subscribe &quot;, &quot;sym &quot;: &quot;BRD,EUR/USD,.WTI,TRP,TLV,FP,M,SNP &quot;, &quot;prm &quot;: {}, &quot;OK &quot;: 1 }')
+                    # Wait for 5 messages
+                    my_web_socket.wait_for_messages(5)
+
+
+                    my_web_socket.close()
+
+                </code>
+                            </pre>
+                        </article>
+                    </div>
+                    <div>
+                        <header id="r-program" class="anchor">
+                            <h3>Implementare R</h3>
+                        </header>
+                        <article>
+                            <h3>Exemplu de comenzi posibile</h3>
+                            <pre class="prettyprint source lang-javascript">
+                                <code>##install.packages('websocket')
+            ##install.packages('rjson')
+            library('websocket')
+            library('rjson')
+
+            ##Connect to API with websocket package
+            { ws &lt;- WebSocket$new(&quot;wss://api.tradeville.ro:443 &quot;,protocol=&quot;apitv &quot;)
+              ws$onOpen(function(event){cat(&quot;connected\n &quot;)})
+              ws$onMessage(function(event){CurrentMsg &lt;&lt;- event$data;Process_Msg(CurrentMsg);})
+              ws$onClose(function(event){cat(&quot;Closed\n &quot;)}) }
+
+
+            ##Message processing (can be expanede for specific needs)
+            Process_Msg &lt;-function (Msg){
+              ##Add To Log
+              write(paste(&quot;#$#NewMsg#$#at &quot;,toString(Sys.time()),&quot;#$#=&quot;,Msg, &quot;\n &quot;),file=&quot;TDV_API_LOG &quot;,append=TRUE);
+
+              ##Get Message in List Variable
+              MsgL &lt;&lt;- fromJSON(Msg, simplify=FALSE);
+
+              ##Test for errors
+              if(exists('err',MsgL)){
+                  print(MsgL$err);
+                  return;
+              }
+
+              if(exists('cmd',MsgL)){
+                ##Symbol
+                if(MsgL$cmd==&quot;Symbol &quot;){
+                    print('Symbol');
+                    print(MsgL$data);
+                    return;
+                }
+
+                ##Portfolio
+                if(MsgL$cmd==&quot;Portfolio &quot;){
+                  print('Symbol');
+                  print(MsgL$data);
+                  return;
+                }
+              }
+              print('OtherCommand');
+              print(MsgL);
+            }
+
+
+            ##==========API COMMANDS==========##
+
+            ##LOGIN on DemoAccount
+            ws$send('{&quot;cmd &quot;:&quot;login &quot;,&quot;prm &quot;:{&quot;coduser &quot;:&quot;!DemoAPITDV &quot;, &quot;parola &quot;:&quot;DemoAPITDV &quot;,&quot;demo &quot;: true }}')
+            ##or
+            ##LOGIN on RealAccount
+            ws$send('{&quot;cmd &quot;:&quot;login &quot;,&quot;prm &quot;:{&quot;coduser &quot;:&quot;DemoAPITDV &quot;, &quot;parola &quot;:&quot;DemoAPITDV &quot;,&quot;demo &quot;: false }}')
+
+            ##Get SymbolMarket Data
+            ws$send('{ &quot;cmd &quot;: &quot;SearchSymbol &quot;, &quot;prm &quot;: { &quot;search &quot;: &quot;electric &quot;} }') ##Search symbol by name
+            ws$send('{ &quot;cmd &quot;: &quot;Symbol &quot;, &quot;prm &quot;: { &quot;symbol &quot;: &quot;BRD &quot;} }') ##Current Price & Details for specific symbol
+            ws$send('{ &quot;cmd &quot;: &quot;Level2 &quot;, &quot;prm &quot;: { &quot;symbol &quot;: &quot;BRD &quot;} }') ##Market Depth for specific symbol
+            ws$send('{ &quot;cmd &quot;: &quot;DailyValues &quot;, &quot;prm &quot;: { &quot;symbol &quot;: &quot;BRD &quot;, &quot;dstart &quot;: &quot;1jan19 &quot;, &quot;dend &quot;: null } }') ##Daily Values for specific symbol
+            ws$send('{ &quot;cmd &quot;: &quot;Trades &quot;, &quot;prm &quot;: { &quot;symbol &quot;: &quot;BRD &quot;, &quot;dstart &quot;: &quot;1oct19 &quot;, &quot;dend &quot;: &quot;20oct19 &quot;} }') ##Transaction History for specific symbol
+            ws$send('{ &quot;cmd &quot;: &quot;subscribe &quot;, &quot;sym &quot;: &quot;BRD &quot;, &quot;prm &quot;: {}, &quot;OK &quot;: 1 }') ##Subscribe to market Quotes for specific symbol
+            ws$send('{ &quot;cmd &quot;: &quot;subscribe &quot;, &quot;sym &quot;: &quot;BRD,EUR/USD,.WTI &quot;, &quot;prm &quot;: {}, &quot;OK &quot;: 1 }') ##Subscribe to market Quotes for a list of symbols
+
+            ##GET PORTFOLIO HOLDINGS
+            ws$send('{ &quot;cmd &quot;: &quot;Portfolio &quot;, &quot;prm &quot;: { &quot;data &quot;: &quot;null &quot;} }')    ##Current Portfolio
+            ws$send('{ &quot;cmd &quot;: &quot;Portfolio &quot;, &quot;prm &quot;: { &quot;date &quot;: &quot;6oct19 &quot;} }')  ##Portfolio at specific date
+            ws$send('{ &quot;cmd &quot;: &quot;FXBNR &quot;, &quot;prm &quot;: { &quot;ccy &quot;: null, &quot;dstart &quot;: &quot;1oct19 &quot;, &quot;dend &quot;: &quot;10oct19 &quot;} }') ##BNR Official Currency Rates
+
+            ##GET Orders
+            ws$send('{ &quot;cmd &quot;: &quot;Orders &quot;, &quot;prm &quot;: { &quot;symbol &quot;: &quot;AAG &quot;, &quot;dstart &quot;: null } }');
+
+            ##GET Activity
+            ws$send('{ &quot;cmd &quot;: &quot;Activity &quot;, &quot;prm &quot;: { &quot;symbol &quot;: null, &quot;dstart &quot;: &quot;1oct19 &quot;, &quot;dend &quot;: &quot;10oct19 &quot;} }');
+
+            ##Close Connection
+            ws$close()
+
+            </code>
+                            </pre>
+                        </article>
+                    </div>
+                </section>
+            </h4>
+        </div>
+        <nav id="navig">
+            <h2>
+                <a href="#">Documentatie API Tradeville</a>
+            </h2>
+            <h3>Introducere</h3>
+            <ul>
+                <li>
+                    <a href="#scop" class="anchor">Scop</a>
+                </li>
+                <li>
+                    <a href="#pimplementare" class="anchor">Principii de implementare</a>
+                </li>
+                <li>
+                    <a href="#pfolosire" class="anchor">Principii de folosire</a>
+                </li>
+            </ul>
+            <h3>Comenzi disponibile</h3>
+            <ul>
+                <li>
+                    <a href="#login" class="anchor">Login</a>
+                </li>
+                <li>
+                    <a href="#portfolio" class="anchor">Portfolio</a>
+                </li>
+                <li>
+                    <a href="#subscr" class="anchor">Subscribe</a>
+                </li>
+                <li>
+                    <a href="#fxbnr" class="anchor">FXBNR</a>
+                </li>
+                <li>
+                    <a href="#activity" class="anchor">Activity</a>
+                </li>
+                <li>
+                    <a href="#searchs" class="anchor">SearchSymbol</a>
+                </li>
+                <li>
+                    <a href="#orders" class="anchor">Orders</a>
+                </li>
+                <li>
+                    <a href="#simbool" class="anchor">Symbol</a>
+                </li>
+                <li>
+                    <a href="#level2" class="anchor">Level2</a>
+                </li>
+                <li>
+                    <a href="#daily" class="anchor">DailyValues</a>
+                </li>
+                <li>
+                    <a href="#trades" class="anchor">Trades</a>
+                </li>
+            </ul>
+            <h3>Exemple de implementare</h3>
+            <ul>
+                <li>
+                    <a href="#JSexample" class="anchor">JS/HTML</a>
+                </li>
+                <li>
+                    <a href="#nodejs" class="anchor">NodeJS</a>
+                </li>
+                <li>
+                    <a href="#python" class="anchor">Python</a>
+                </li>
+                <li>
+                    <a href="#r-program" class="anchor">R</a>
+                </li>
+            </ul>
+        </nav>
+        <br class="clear">
+        <footer>©2023 All rights reserved TRADEVILLE SA </footer>
+        <script src="../../jquery-3.5.1.min.js"></script>
+        <script>
+            function isElementInViewport(t) {
+                "function" == typeof jQuery && t instanceof jQuery && (t = t[0]);
+                var e = t.getBoundingClientRect();
+                return e.top <= 0 && e.left >= 0 && e.bottom <= (window.innerHeight || document.documentElement.clientHeight) && e.right <= (window.innerWidth || document.documentElement.clientWidth)
+            }
+            $(".anchor").on("click", function(t) {
+                t.preventDefault(),
+                document.getElementById("active") && (document.getElementById("active").id = ""),
+                this.id = "active";
+                var e = this.href
+                  , n = e.substring(e.indexOf("#"));
+                $("html, body").animate({
+                    scrollTop: $(n).offset().top
+                }, 1e3, function() {
+                    window.location.hash = n
+                })
+            }),
+            $(document).on("scroll", function() {
+                $("#main .anchor").each(function(t, e) {
+                    if (isElementInViewport(e) && window.history.pushState) {
+                        var n = "#" + $(e).attr("id");
+                        document.getElementById("active") && (document.getElementById("active").id = ""),
+                        $("a[href=' + urlHash + ']").attr("id", "active"),
+                        window.history.pushState(null, null, n)
+                    }
+                })
+            })
+        </script>
+    </body>
+</html>
