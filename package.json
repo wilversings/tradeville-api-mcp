@@ -6,9 +6,12 @@
   "bin": {
     "tradeville-api-mcp": "dist/index.js"
   },
+  "files": [
+    "dist"
+  ],
   "scripts": {
-    "build": "tsc",
-    "dev": "tsc --watch",
+    "build": "node build.mjs",
+    "dev": "tsc --noEmit --watch",
     "start": "node dist/index.js"
   },
   "dependencies": {
@@ -19,6 +22,7 @@
   "devDependencies": {
     "@types/node": "^22.10.0",
     "@types/ws": "^8.5.13",
+    "esbuild": "^0.28.1",
     "typescript": "^5.7.0"
   },
   "engines": {

@@ -1,4 +1,5 @@
 import { WebSocket } from "ws";
+import { resolveCredentials } from "./credentials.js";
 import type { TradevilleConfig, TradevilleResponse, TradeParams } from "./types.js";
 
 const WS_URL = "wss://api.tradeville.ro:443";
@@ -23,21 +24,24 @@ function sleep(ms: number): Promise<void> {
  * time, with minimum spacing) to stay within the documented rate limit.
  */
 export class TradevilleClient {
-  private readonly config: TradevilleConfig;
+  private config: TradevilleConfig | null = null;
+  private readonly credentialsError: string | null = null;
   private ws: WebSocket | null = null;
   private readyPromise: Promise<void> | null = null;
   private queue: PendingRequest[] = [];
   private sendChain: Promise<TradevilleResponse | undefined> = Promise.resolve(undefined);
   private lastSendAt = 0;
 
-  constructor(config?: Partial<TradevilleConfig>) {
-    this.config = {
-      user: config?.user ?? process.env.TDV_USER ?? "!DemoAPITDV",
-      pass: config?.pass ?? process.env.TDV_PASS ?? "DemoAPITDV",
-      demo:
-        config?.demo ??
-        (process.env.TDV_DEMO ? process.env.TDV_DEMO.toLowerCase() === "true" : true),
-    };
+  constructor(config?: TradevilleConfig) {
+    if (config) {
+      this.config = config;
+      return;
+    }
+    try {
+      this.config = resolveCredentials();
+    } catch (err) {
+      this.credentialsError = err instanceof Error ? err.message : String(err);
+    }
   }
 
   /** Send a command, connecting and logging in first if needed. */
@@ -64,6 +68,9 @@ export class TradevilleClient {
   }
 
   private async connectAndLogin(): Promise<void> {
+    if (!this.config) {
+      throw new Error(this.credentialsError ?? "Tradeville credentials could not be resolved");
+    }
     await this.connect();
     const loginResp = await this.send("login", {
       coduser: this.config.user,

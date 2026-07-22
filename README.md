@@ -17,17 +17,24 @@ npm run build
 
 ## Configuration
 
-Credentials are read from environment variables. If unset, they default to Tradeville's public
-read-only demo account, so the server works out-of-the-box with no configuration:
+Credentials are read from the OS keyring (freedesktop Secret Service / KWallet, via `secret-tool`)
+— never from environment variables or a config file — so a real account's password never has to
+sit in plaintext in an MCP client config (e.g. `~/.claude.json`), which is often
+world-readable-by-you-but-synced/backed-up and read by many tools.
 
-| Variable    | Default          | Description                                  |
-|-------------|------------------|-----------------------------------------------|
-| `TDV_USER`  | `!DemoAPITDV`    | Tradeville user code (`coduser`)              |
-| `TDV_PASS`  | `DemoAPITDV`     | Account password (`parola`)                   |
-| `TDV_DEMO`  | `true`           | Whether the account is a demo account         |
+Store your credentials once:
 
-Copy `.env.example` for reference; the server reads `process.env` directly (use your MCP client's
-env config, or a tool like `dotenv-cli`, to set these when running).
+```bash
+secret-tool store --label 'Tradeville API user' service tradeville-api-mcp key user
+secret-tool store --label 'Tradeville API password' service tradeville-api-mcp key pass
+```
+
+Requires a running Secret Service provider (GNOME Keyring, KWallet's `ksecretd`, etc.) and
+`secret-tool` (`libsecret-tools` / `libsecret` package).
+
+If credentials aren't stored, the server still starts and the MCP handshake still completes —
+tool calls fail with a clear setup error instead (a crashed server before the handshake completes
+just shows a generic "Connection closed" with no detail).
 
 ## Registering with an MCP client
 
@@ -38,18 +45,13 @@ Example for Claude Desktop / Claude Code (`mcpServers` config):
   "mcpServers": {
     "tradeville": {
       "command": "node",
-      "args": ["/absolute/path/to/tradeville-api-mcp/dist/index.js"],
-      "env": {
-        "TDV_USER": "your-user-code",
-        "TDV_PASS": "your-password",
-        "TDV_DEMO": "false"
-      }
+      "args": ["/absolute/path/to/tradeville-api-mcp/dist/index.js"]
     }
   }
 }
 ```
 
-Omit `env` entirely to use the public demo account.
+No `env` block needed — the server resolves credentials from the keyring itself at startup.
 
 ## Tools
 
