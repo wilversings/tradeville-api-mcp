@@ -17,9 +17,11 @@ function coerce(value: string): JsonValue {
 }
 
 /**
- * Parses the tab-separated BVB stock screener snapshot. The file starts with
- * an Excel "SEP=" hint line, followed by a tab-separated header row and data
- * rows (CRLF line endings).
+ * Parses the tab-separated BVB stock screener snapshot — a CSV export from the
+ * stock screener on the Tradeville web portal (portal.tradeville.ro), not the
+ * api.tradeville.ro WebSocket API the rest of this server talks to. The file
+ * starts with an Excel "SEP=" hint line (Excel's own CSV export format),
+ * followed by a tab-separated header row and data rows (CRLF line endings).
  */
 function loadStockScreen(): Record<string, JsonValue>[] {
   if (cachedRows) return cachedRows;

@@ -1,4 +1,4 @@
-# tradeville-api-mcp
+# Tradeville API MCP
 
 An MCP (Model Context Protocol) server exposing the [Tradeville](https://www.tradeville.eu/) trading
 platform API (https://api.tradeville.ro/): account portfolio/activity reporting plus Romanian (BVB)
@@ -77,7 +77,7 @@ No `env` block needed either way — credentials are resolved from the keyring a
 | `get_activity`     | Account activity (trades, deposits/withdrawals) for a date range |
 | `get_orders`       | Orders placed on a symbol                                        |
 | `get_fx_rates`     | Official BNR exchange rates for a currency/date range             |
-| `get_stock_screen` | Fundamental/valuation screening data for BVB stocks (static snapshot) |
+| `get_stock_screen` | Fundamental/valuation screening data for BVB stocks (static CSV export from the [Tradeville portal](https://portal.tradeville.ro/)'s stock screener) |
 
 Results are arrays of row objects (columnar API responses transposed for readability). Dates accept
 either the API's compact form (`"1oct20"`) or ISO (`"2020-10-01"`).
@@ -90,6 +90,11 @@ MCP's request/response model — use `get_symbol` for on-demand quotes instead.
 - The API rate-limits to ~20 commands/10s; this server serializes requests over a single connection
   with spacing to stay well under that.
 - The connection lazily connects/logs in on first tool call and transparently reconnects on drop.
+- `get_stock_screen` doesn't call the WebSocket API at all: it reads `staticdata/stockscreen.csv`, a
+  manually refreshed CSV export from the stock screener at
+  [portal.tradeville.ro](https://portal.tradeville.ro/) (Tradeville's web trading portal, distinct
+  from the `api.tradeville.ro` WebSocket API used by every other tool). Data is only as fresh as the
+  last export.
 
 ## Development
 

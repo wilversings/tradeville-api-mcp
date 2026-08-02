@@ -41,7 +41,9 @@ server.registerTool(
   {
     description:
       "Get fundamental/valuation screening data for BVB-listed (Bucharest Stock Exchange) stocks, from a " +
-      "static local snapshot (not live). Returns rows with: Simbol, Cotatie (price), Capitalizare (market cap), " +
+      "static CSV export of the stock screener on the Tradeville web portal (portal.tradeville.ro) — not " +
+      "live data, and not from the api.tradeville.ro WebSocket API used by the other tools. Freshness " +
+      "depends on when the export was last taken. Returns rows with: Simbol, Cotatie (price), Capitalizare (market cap), " +
       "MedieZilnicaTranz (avg daily traded value), VarYoY, VarYTD, BET_YTD, BET_YoY, VariatieCA, VariatieProfitNet, " +
       "PE, PBV, GradIndatorare (leverage), CapitNetpeAct, ROE, ROA, MarjaOperationala, MarjaNeta, DataURap " +
       "(latest report date), PS, PAvgProfit, PBVxPE, PretNWCPS, nume (company name), RandDividendHist, " +
