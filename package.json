@@ -2,6 +2,25 @@
   "name": "tradeville-api-mcp",
   "version": "0.1.0",
   "description": "MCP server exposing the Tradeville trading platform API (portfolio, market data, BVB) as tools",
+  "keywords": [
+    "mcp",
+    "model-context-protocol",
+    "tradeville",
+    "trading",
+    "portfolio",
+    "bvb",
+    "stock-market"
+  ],
+  "homepage": "https://github.com/wilversings/tradeville-api-mcp#readme",
+  "bugs": {
+    "url": "https://github.com/wilversings/tradeville-api-mcp/issues"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/wilversings/tradeville-api-mcp.git"
+  },
+  "license": "MIT",
+  "author": "Marius Aiordăchioaei <aiordachioaei.marius@gmail.com>",
   "type": "module",
   "bin": {
     "tradeville-api-mcp": "dist/index.js"
@@ -12,7 +31,9 @@
   "scripts": {
     "build": "node build.mjs",
     "dev": "tsc --noEmit --watch",
-    "start": "node dist/index.js"
+    "start": "node dist/index.js",
+    "prepublishOnly": "npm run build",
+    "publish:npm": "npm publish"
   },
   "dependencies": {
     "@modelcontextprotocol/sdk": "^1.12.0",

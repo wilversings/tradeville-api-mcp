@@ -35,6 +35,22 @@ before handshake.
 
 ## Registering with an MCP client
 
+Via `npx` (fetches the [published package](https://www.npmjs.com/package/tradeville-api-mcp), no local
+clone needed):
+
+```json
+{
+  "mcpServers": {
+    "tradeville": {
+      "command": "npx",
+      "args": ["-y", "tradeville-api-mcp"]
+    }
+  }
+}
+```
+
+Or against a local build:
+
 ```json
 {
   "mcpServers": {
@@ -46,7 +62,7 @@ before handshake.
 }
 ```
 
-No `env` block needed — credentials are resolved from the keyring at startup.
+No `env` block needed either way — credentials are resolved from the keyring at startup.
 
 ## Tools
 
