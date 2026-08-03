@@ -1,6 +1,6 @@
 {
   "name": "tradeville-api-mcp",
-  "version": "0.1.0",
+  "version": "0.9.0",
   "description": "MCP server exposing the Tradeville trading platform API (portfolio, market data, BVB) as tools",
   "keywords": [
     "mcp",
@@ -20,7 +20,7 @@
     "url": "git+https://github.com/wilversings/tradeville-api-mcp.git"
   },
   "license": "MIT",
-  "author": "Marius Aiordăchioaei <aiordachioaei.marius@gmail.com>",
+  "author": "Marius Aiordăchioaei",
   "type": "module",
   "bin": {
     "tradeville-api-mcp": "dist/index.js"
