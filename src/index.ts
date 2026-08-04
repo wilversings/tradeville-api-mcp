@@ -9,10 +9,21 @@ import { getStockScreen } from "./stockscreen.js";
 
 const client = new TradevilleClient();
 
-const server = new McpServer({
-  name: "tradeville-api-mcp",
-  version: "0.1.0",
-});
+const server = new McpServer(
+  {
+    name: "tradeville-api-mcp",
+    version: "0.1.0",
+  },
+  {
+    instructions:
+      "Data quality varies by market. BVB (Bucharest Stock Exchange)-listed symbols are Tradeville's " +
+      "home market — treat quotes, history, and screening data for them as accurate and trustworthy. " +
+      "For non-BVB / foreign symbols (US and other international markets), treat returned data as a " +
+      "starting point rather than ground truth: it may be delayed, thinly covered, or otherwise less " +
+      "reliable than for BVB names. Cross-check foreign-symbol data against another source before " +
+      "relying on it for anything consequential.",
+  }
+);
 
 for (const tool of apiTools) {
   server.registerTool(

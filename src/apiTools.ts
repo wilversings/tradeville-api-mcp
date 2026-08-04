@@ -23,6 +23,10 @@ function defineTool<Shape extends z.ZodRawShape>(tool: ApiToolDefinition<Shape>)
 const DATE_DESC =
   'Date string. Accepts the Tradeville compact form (e.g. "1oct20") or an ISO date ("2020-10-01").';
 
+const FOREIGN_DATA_CAVEAT =
+  " Covers both BVB (Bucharest Stock Exchange) and foreign-listed symbols; treat BVB data as reliable, " +
+  "but corroborate non-BVB/foreign data with another source before relying on it.";
+
 export const apiTools: ApiToolDefinition[] = [
   defineTool({
     name: "get_portfolio",
@@ -42,7 +46,8 @@ export const apiTools: ApiToolDefinition[] = [
   defineTool({
     name: "search_symbol",
     description:
-      "Search for tradeable symbols whose name contains the given term. Returns rows with: Symbol, Name, ISIN.",
+      "Search for tradeable symbols whose name contains the given term. Returns rows with: Symbol, Name, ISIN." +
+      FOREIGN_DATA_CAVEAT,
     schema: {
       search: z.string().describe("Search term to match against symbol names."),
     },
@@ -53,7 +58,8 @@ export const apiTools: ApiToolDefinition[] = [
     name: "get_symbol",
     description:
       "Get current market data and reference details for a single symbol: price, bid/ask, day range, trading limits, " +
-      "market, currency, and (depending on instrument type) bond/structured-product fields like StrikePrice, YTM, CouponDate.",
+      "market, currency, and (depending on instrument type) bond/structured-product fields like StrikePrice, YTM, CouponDate." +
+      FOREIGN_DATA_CAVEAT,
     schema: {
       symbol: z.string().describe('Symbol code, e.g. "BRD".'),
     },
@@ -63,7 +69,8 @@ export const apiTools: ApiToolDefinition[] = [
   defineTool({
     name: "get_market_depth",
     description:
-      "Get order book depth (Level2) for a symbol: bid/ask price levels with quantities and order counts per level.",
+      "Get order book depth (Level2) for a symbol: bid/ask price levels with quantities and order counts per level." +
+      FOREIGN_DATA_CAVEAT,
     schema: {
       symbol: z.string().describe('Symbol code, e.g. "BRD".'),
       levels: z
@@ -83,7 +90,8 @@ export const apiTools: ApiToolDefinition[] = [
     name: "get_daily_values",
     description:
       "Get daily OHLCV history for a symbol over a date range. Returns rows with: Symbol, Date, Open, Low, High, Close, " +
-      "Volume, Value, Trades.",
+      "Volume, Value, Trades." +
+      FOREIGN_DATA_CAVEAT,
     schema: {
       symbol: z
         .string()
@@ -112,7 +120,8 @@ export const apiTools: ApiToolDefinition[] = [
     name: "get_trades",
     description:
       "Get individual trade ticks for a symbol over a date range. Returns rows with: Symbol, Date, Price, Volume, Trades, " +
-      "Agres, BidQ, Bid, Ask, AskQ.",
+      "Agres, BidQ, Bid, Ask, AskQ." +
+      FOREIGN_DATA_CAVEAT,
     schema: {
       symbol: z
         .string()

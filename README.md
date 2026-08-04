@@ -104,6 +104,10 @@ them up, rather than failing silently.
 - **Stock-screen data** (`get_stock_screen`) is a periodically refreshed export from the stock
   screener at [portal.tradeville.ro](https://portal.tradeville.ro/), so it's only as fresh as the last
   export — unlike every other tool, which pulls live from the API.
+- **Data reliability differs by market.** BVB (Bucharest Stock Exchange) data is Tradeville's home
+  turf and can be trusted. Data for foreign symbols is passed through the same tools but is worth a
+  second check against another source before you rely on it — the server tells connected assistants
+  this too, so expect them to flag it.
 
 ## Building from source
 
