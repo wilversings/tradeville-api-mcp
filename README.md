@@ -1,5 +1,12 @@
 # Tradeville API MCP
 
+[![npm version](https://img.shields.io/npm/v/tradeville-api-mcp.svg)](https://www.npmjs.com/package/tradeville-api-mcp)
+[![npm downloads](https://img.shields.io/npm/dm/tradeville-api-mcp.svg)](https://www.npmjs.com/package/tradeville-api-mcp)
+[![node version](https://img.shields.io/node/v/tradeville-api-mcp.svg)](https://www.npmjs.com/package/tradeville-api-mcp)
+[![Publish to npm](https://github.com/wilversings/tradeville-api-mcp/actions/workflows/npm-publish.yml/badge.svg)](https://github.com/wilversings/tradeville-api-mcp/actions/workflows/npm-publish.yml)
+[![last commit](https://img.shields.io/github/last-commit/wilversings/tradeville-api-mcp.svg)](https://github.com/wilversings/tradeville-api-mcp/commits/main)
+[![license](https://img.shields.io/npm/l/tradeville-api-mcp.svg)](LICENSE)
+
 Connect your AI assistant to the [Tradeville](https://www.tradeville.eu/) brokerage. This is an
 [MCP](https://modelcontextprotocol.io/) server that lets Claude (or any MCP-capable assistant) read
 your account and pull Romanian (BVB) and international market data — so you can just *ask* about your
