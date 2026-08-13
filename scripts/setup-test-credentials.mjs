@@ -16,6 +16,7 @@
 
 import { execFileSync, spawnSync } from "node:child_process";
 import { mkdirSync } from "node:fs";
+import { homedir } from "node:os";
 import path from "node:path";
 import {
   TEST_SERVICE,
@@ -73,19 +74,27 @@ function setupLinux() {
 }
 
 function setupMacos() {
-  const keychains = run("security", ["list-keychains", "-d", "user"]).stdout;
-  const existing = [...keychains.matchAll(/"([^"]+)"/g)].map((m) => m[1]);
+  // Absolute path throughout: `security` resolving a bare keychain name is
+  // version-dependent (and silently appends -db), which makes the search-list
+  // comparison below unreliable.
+  const keychain = path.join(homedir(), "Library", "Keychains", MACOS_KEYCHAIN);
+
+  const listed = run("security", ["list-keychains", "-d", "user"]).stdout;
+  const existing = [...listed.matchAll(/"([^"]+)"/g)].map((m) => m[1]);
 
   // create-keychain fails if it already exists, which is fine on a re-run.
-  run("security", ["create-keychain", "-p", MACOS_KEYCHAIN_PASSWORD, MACOS_KEYCHAIN], {
+  run("security", ["create-keychain", "-p", MACOS_KEYCHAIN_PASSWORD, keychain], {
     allowFailure: true,
   });
+  run("security", ["unlock-keychain", "-p", MACOS_KEYCHAIN_PASSWORD, keychain]);
   // No auto-lock: an idle-locked keychain would make lookups fail mid-run.
-  run("security", ["set-keychain-settings", MACOS_KEYCHAIN]);
-  run("security", ["unlock-keychain", "-p", MACOS_KEYCHAIN_PASSWORD, MACOS_KEYCHAIN]);
+  run("security", ["set-keychain-settings", keychain]);
 
-  if (!existing.some((entry) => entry.includes("tradeville-test"))) {
-    run("security", ["list-keychains", "-d", "user", "-s", MACOS_KEYCHAIN, ...existing]);
+  // find-generic-password only searches the keychains on the search list, so
+  // the new one has to join it — keeping the existing entries, which include
+  // the user's login keychain.
+  if (!existing.includes(keychain)) {
+    run("security", ["list-keychains", "-d", "user", "-s", keychain, ...existing]);
   }
 
   for (const [key, value] of [
@@ -104,7 +113,7 @@ function setupMacos() {
       key,
       "-w",
       value,
-      MACOS_KEYCHAIN,
+      keychain,
     ]);
   }
 }
@@ -135,6 +144,9 @@ ConvertTo-SecureString -String $env:TDV_TEST_VALUE -AsPlainText -Force |
       ["-NoProfile", "-NonInteractive", "-EncodedCommand", encoded],
       { encoding: "utf8", env: { ...process.env, TDV_TEST_VALUE: value } }
     );
+    if (result.error) {
+      fail("failed to run `powershell.exe`", result.error.message);
+    }
     if (result.status !== 0) {
       fail(`failed to store the ${key} credential via DPAPI`, result.stderr || result.stdout);
     }
