@@ -32,6 +32,9 @@
     "build": "node build.mjs",
     "dev": "tsc --noEmit --watch",
     "start": "node dist/index.js",
+    "test:setup": "node scripts/setup-test-credentials.mjs",
+    "test:integration": "node --test --test-reporter=spec \"tests/**/*.test.mjs\"",
+    "test": "npm run build && npm run test:setup && npm run test:integration",
     "prepublishOnly": "npm run build",
     "publish:npm": "npm publish"
   },

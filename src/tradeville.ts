@@ -2,7 +2,9 @@ import { WebSocket } from "ws";
 import { resolveCredentials } from "./credentials.js";
 import type { TradevilleConfig, TradevilleResponse, TradeParams } from "./types.js";
 
-const WS_URL = "wss://api.tradeville.ro:443";
+// Overridable so the integration tests can point the client at a local mock of
+// the Tradeville WebSocket protocol instead of the live API.
+const WS_URL = process.env.TRADEVILLE_WS_URL?.trim() || "wss://api.tradeville.ro:443";
 const PROTOCOL = "apitv";
 const REQUEST_TIMEOUT_MS = 15_000;
 // Docs specify a limit of ~20 commands / 10s; keep well under that.

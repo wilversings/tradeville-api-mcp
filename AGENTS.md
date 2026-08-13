@@ -17,17 +17,37 @@ npm run dev     # tsc --watch
 npm start        # node dist/index.js
 ```
 
-No test suite exists yet. Verify changes by running the built server through the MCP Inspector CLI:
+## Tests
+
+```bash
+npm test                                          # build + provision credentials + run (macOS/Windows)
+dbus-run-session -- ./scripts/run-tests-linux.sh  # Linux: needs an unlocked Secret Service session
+```
+
+`tests/` holds black-box integration tests: they spawn the built `dist/index.js` as a real child
+process, drive it over stdio with the MCP SDK's own client, and point it at a local mock of the
+Tradeville WebSocket protocol (`tests/helpers/mockTradeville.mjs`). Nothing inside the server is
+stubbed. See [tests/README.md](tests/README.md) for the layout, and
+[.github/workflows/tests.yml](.github/workflows/tests.yml) for the Linux/macOS/Windows matrix.
+
+Two env vars exist solely so the tests can do this. Both are lookup keys, never secrets:
+
+- `TRADEVILLE_WS_URL` — point the client at the mock instead of `wss://api.tradeville.ro:443`.
+- `TRADEVILLE_CREDENTIAL_SERVICE` — the secret-store namespace to read. Tests use
+  `tradeville-api-mcp-test` so they can never clobber real stored credentials.
+
+The tests still read credentials through the genuine per-platform backend, which is the whole
+reason the matrix spans three OSes — that code is the only part of the server that differs by
+platform. `scripts/setup-test-credentials.mjs` provisions fixture values into the native store.
+
+For a manual smoke test against the **live public demo account** (`!DemoAPITDV`, default
+credentials), use the MCP Inspector CLI — but mind the API's rate limit (~20 commands/10s):
 
 ```bash
 npx @modelcontextprotocol/inspector --cli node dist/index.js --method tools/list
 npx @modelcontextprotocol/inspector --cli node dist/index.js --method tools/call \
   --tool-name get_symbol --tool-arg symbol=BRD
 ```
-
-These hit the **live public demo account** (`!DemoAPITDV`, default credentials) over the real
-Tradeville WebSocket — there is no mock/sandbox. Be mindful of the API's rate limit (~20
-commands/10s) when testing.
 
 ## Architecture
 
@@ -39,6 +59,9 @@ commands/10s) when testing.
   `cmd`, param mapping). Add a new Tradeville command by adding an entry here.
 - [src/index.ts](src/index.ts) — MCP server entrypoint; wires `tools.ts` definitions into
   `McpServer.registerTool()` over a stdio transport.
+- [src/credentials.ts](src/credentials.ts) — reads the username/password from the OS secret store,
+  with one backend per platform (`secret-tool` on Linux, `security`/keychain on macOS, DPAPI via
+  PowerShell on Windows). Never reads a secret from an env var or config file.
 - [src/types.ts](src/types.ts) — shared types for the raw API response shape.
 
 ## Important gotchas (learned the hard way)
@@ -70,3 +93,6 @@ commands/10s) when testing.
   shape ahead of a call) — follow the existing pattern in `tools.ts`.
 - Dates are passed through as opaque strings (API accepts its own compact form like `"1oct20"` or
   ISO); don't add client-side date parsing/validation.
+- Adding a tool means adding a case to `CASES` in [tests/apiTools.test.mjs](tests/apiTools.test.mjs)
+  and a fixture in `tests/helpers/mockTradeville.mjs`; `tests/discovery.test.mjs` pins the full tool
+  list, so it fails until the new tool is declared there too.

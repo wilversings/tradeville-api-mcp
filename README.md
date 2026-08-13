@@ -3,6 +3,7 @@
 [![npm version](https://img.shields.io/npm/v/tradeville-api-mcp.svg)](https://www.npmjs.com/package/tradeville-api-mcp)
 [![npm downloads](https://img.shields.io/npm/dm/tradeville-api-mcp.svg)](https://www.npmjs.com/package/tradeville-api-mcp)
 [![node version](https://img.shields.io/node/v/tradeville-api-mcp.svg)](https://www.npmjs.com/package/tradeville-api-mcp)
+[![Tests](https://github.com/wilversings/tradeville-api-mcp/actions/workflows/tests.yml/badge.svg)](https://github.com/wilversings/tradeville-api-mcp/actions/workflows/tests.yml)
 [![Publish to npm](https://github.com/wilversings/tradeville-api-mcp/actions/workflows/npm-publish.yml/badge.svg)](https://github.com/wilversings/tradeville-api-mcp/actions/workflows/npm-publish.yml)
 [![last commit](https://img.shields.io/github/last-commit/wilversings/tradeville-api-mcp.svg)](https://github.com/wilversings/tradeville-api-mcp/commits/main)
 [![license](https://img.shields.io/npm/l/tradeville-api-mcp.svg)](LICENSE)
@@ -74,6 +75,8 @@ store** — never from an environment variable or a config file. That means your
 sits in plaintext in a file like `~/.claude.json`, which is often synced, backed up, and readable by
 other tools on your machine.
 
+Pick the section for your platform; you only need one.
+
 **Linux** — stored via the freedesktop Secret Service / KWallet, using `secret-tool`:
 
 ```bash
@@ -83,6 +86,15 @@ secret-tool store --label 'Tradeville API password' service tradeville-api-mcp k
 
 This needs a running secret-service provider (GNOME Keyring, KWallet's `ksecretd`, etc.) and the
 `secret-tool` command (from the `libsecret-tools` / `libsecret` package).
+
+**macOS** — stored in your login keychain, using the built-in `security` command:
+
+```bash
+security add-generic-password -U -s tradeville-api-mcp -a user -w
+security add-generic-password -U -s tradeville-api-mcp -a pass -w
+```
+
+Leaving `-w` without a value makes it prompt, so nothing lands in your shell history.
 
 **Windows** — encrypted with DPAPI (tied to your Windows user account, nothing extra to install), via
 PowerShell:
@@ -142,8 +154,12 @@ Handy during development:
 
 ```bash
 npm run dev    # tsc --watch
+npm test       # integration tests (Linux: dbus-run-session -- ./scripts/run-tests-linux.sh)
 npx @modelcontextprotocol/inspector node dist/index.js   # interactive MCP inspector
 ```
+
+The integration tests run the built server for real over MCP against a local mock of the Tradeville
+WebSocket API, on Linux, macOS and Windows — see [tests/README.md](tests/README.md).
 
 The underlying Tradeville API is WebSocket-only (`wss://api.tradeville.ro:443`, subprotocol `apitv`)
 and read-only for reporting. The vendored API reference (in Romanian) is in `doc/index.html`.
