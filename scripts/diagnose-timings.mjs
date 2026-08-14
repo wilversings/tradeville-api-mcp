@@ -61,6 +61,64 @@ console.log(`platform ${process.platform}, node ${process.version}\n`);
 await time("credential lookup, inherited env", () => lookup(undefined));
 await time("credential lookup, inherited env (2nd)", () => lookup(undefined));
 
+/** Under 10s counts as fast; slower runs are killed rather than waited out. */
+const SLOW_MS = 10_000;
+
+function isFast(env) {
+  const start = performance.now();
+  try {
+    execFileSync(command, args, {
+      encoding: "utf8",
+      stdio: ["ignore", "pipe", "ignore"],
+      timeout: SLOW_MS,
+      env,
+    });
+  } catch {
+    return false;
+  }
+  return performance.now() - start < SLOW_MS;
+}
+
+function pick(keys) {
+  const env = {};
+  for (const key of keys) env[key] = process.env[key];
+  return env;
+}
+
+/**
+ * Delta-debugs the environment down to the variables PowerShell actually needs
+ * to start promptly, so the fix can name them instead of guessing.
+ */
+function bisectEnv() {
+  let required = Object.keys(process.env);
+  if (!isFast(pick(required))) {
+    console.log("  full environment is already slow; nothing to bisect");
+    return required;
+  }
+
+  let granularity = 2;
+  while (granularity <= required.length) {
+    const size = Math.ceil(required.length / granularity);
+    let reduced = false;
+
+    for (let i = 0; i < required.length; i += size) {
+      const candidate = [...required.slice(0, i), ...required.slice(i + size)];
+      if (candidate.length && isFast(pick(candidate))) {
+        required = candidate;
+        granularity = Math.max(granularity - 1, 2);
+        reduced = true;
+        break;
+      }
+    }
+
+    if (!reduced) {
+      if (granularity === required.length) break;
+      granularity = Math.min(granularity * 2, required.length);
+    }
+  }
+  return required;
+}
+
 if (IS_WINDOWS) {
   await time("credential lookup, pinned PSModulePath", () =>
     lookup({ ...process.env, PSModulePath: psModulePath })
@@ -73,6 +131,17 @@ if (IS_WINDOWS) {
       PSModulePath: psModulePath,
     })
   );
+
+  const sdkDefault = [
+    "APPDATA", "HOMEDRIVE", "HOMEPATH", "LOCALAPPDATA", "PATH",
+    "PROCESSOR_ARCHITECTURE", "SYSTEMDRIVE", "SYSTEMROOT", "TEMP",
+    "USERNAME", "USERPROFILE", "PROGRAMFILES",
+  ];
+  await time("credential lookup, SDK default env", () => lookup(pick(sdkDefault)));
+
+  console.log("\nbisecting the environment PowerShell needs to start promptly:");
+  const required = await time("bisect", () => bisectEnv());
+  console.log(`  minimal fast set (${required.length}): ${required.sort().join(", ")}\n`);
 }
 
 const mock = await time("start mock server", () =>

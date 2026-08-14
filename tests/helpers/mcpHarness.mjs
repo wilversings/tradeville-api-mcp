@@ -18,32 +18,12 @@ if (!existsSync(SERVER_ENTRY)) {
 
 // StdioClientTransport replaces the child's environment wholesale, so whatever
 // the credential backends need must be forwarded by hand.
-// Superset of the SDK's own DEFAULT_INHERITED_ENV_VARS: a thin Windows
-// environment makes PowerShell startup pathologically slow, and the credential
-// backend spawns it.
-const PASSTHROUGH_ENV = [
-  "PATH", "Path", "PATHEXT",
-  "APPDATA", "LOCALAPPDATA", "SystemRoot", "SYSTEMROOT", "SYSTEMDRIVE",
-  "windir", "COMSPEC", "PSModulePath", "PROCESSOR_ARCHITECTURE",
-  "PROGRAMFILES", "PROGRAMFILES(X86)", "PROGRAMDATA", "ALLUSERSPROFILE",
-  "USERNAME", "USERDOMAIN", "USERPROFILE", "HOMEDRIVE", "HOMEPATH",
-  "TEMP", "TMP", "NUMBER_OF_PROCESSORS", "OS",
-  "HOME",
-  "DBUS_SESSION_BUS_ADDRESS", "XDG_RUNTIME_DIR", "GNOME_KEYRING_CONTROL",
-];
-
+// StdioClientTransport replaces the child's environment wholesale, so pass the
+// whole thing through. Hand-picking variables starves PowerShell, which the
+// Windows credential backend spawns: a thin environment took 68s per lookup on
+// a CI runner versus under a second with the environment intact.
 function serverEnv(overrides) {
-  const env = {};
-  const seen = new Set();
-  for (const key of PASSTHROUGH_ENV) {
-    // Windows env lookups are case-insensitive, so PATH and Path both resolve;
-    // emitting both would put duplicate keys in the child's environment block.
-    const canonical = key.toLowerCase();
-    if (seen.has(canonical) || process.env[key] === undefined) continue;
-    seen.add(canonical);
-    env[key] = process.env[key];
-  }
-  return { ...env, ...overrides };
+  return { ...process.env, ...overrides };
 }
 
 /**

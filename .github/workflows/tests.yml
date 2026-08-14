@@ -47,7 +47,7 @@ jobs:
       - name: Stage timings
         if: runner.os == 'Windows'
         run: node scripts/diagnose-timings.mjs
-        timeout-minutes: 5
+        timeout-minutes: 12
 
       - name: Run integration tests
         if: runner.os != 'Linux'
