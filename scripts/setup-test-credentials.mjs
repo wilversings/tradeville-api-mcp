@@ -105,6 +105,16 @@ function setupMacos() {
   }
 }
 
+/** See powershellEnv() in src/credentials.ts — same pwsh-7 inheritance trap. */
+function powershellEnv(extra = {}) {
+  const systemRoot = process.env.SystemRoot || process.env.SYSTEMROOT || "C:\\Windows";
+  return {
+    ...process.env,
+    PSModulePath: `${systemRoot}\\System32\\WindowsPowerShell\\v1.0\\Modules`,
+    ...extra,
+  };
+}
+
 function setupWindows() {
   const appData = process.env.APPDATA;
   if (!appData) fail("APPDATA is not set; cannot locate the credential directory.");
@@ -128,7 +138,7 @@ ConvertTo-SecureString -String $env:TDV_TEST_VALUE -AsPlainText -Force |
     const result = spawnSync(
       "powershell.exe",
       ["-NoProfile", "-NonInteractive", "-EncodedCommand", encoded],
-      { encoding: "utf8", env: { ...process.env, TDV_TEST_VALUE: value } }
+      { encoding: "utf8", env: powershellEnv({ TDV_TEST_VALUE: value }) }
     );
     if (result.error) {
       fail("failed to run `powershell.exe`", result.error.message);
@@ -177,12 +187,20 @@ try { [System.Runtime.InteropServices.Marshal]::PtrToStringAuto($bstr) }
 finally { [System.Runtime.InteropServices.Marshal]::ZeroFreeBSTR($bstr) }
 `;
   const encoded = Buffer.from(script, "utf16le").toString("base64");
-  return tryRead("powershell.exe", ["-NoProfile", "-NonInteractive", "-EncodedCommand", encoded]);
+  return tryRead(
+    "powershell.exe",
+    ["-NoProfile", "-NonInteractive", "-EncodedCommand", encoded],
+    powershellEnv()
+  );
 }
 
-function tryRead(command, args) {
+function tryRead(command, args, env) {
   try {
-    return execFileSync(command, args, { encoding: "utf8", stdio: ["ignore", "pipe", "ignore"] }).trim();
+    return execFileSync(command, args, {
+      encoding: "utf8",
+      stdio: ["ignore", "pipe", "ignore"],
+      ...(env ? { env } : {}),
+    }).trim();
   } catch {
     return null;
   }

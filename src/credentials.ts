@@ -47,16 +47,30 @@ then reconnect this MCP server (e.g. restart Claude Code, or use /mcp to reconne
 then reconnect this MCP server (e.g. restart Claude Code, or use /mcp to reconnect).`;
 }
 
-function run(command: string, args: string[]): string | null {
+function run(command: string, args: string[], env?: NodeJS.ProcessEnv): string | null {
   try {
     const value = execFileSync(command, args, {
       encoding: "utf8",
       stdio: ["ignore", "pipe", "ignore"],
+      ...(env ? { env } : {}),
     }).trim();
     return value || null;
   } catch {
     return null;
   }
+}
+
+/**
+ * Windows PowerShell cannot autoload its own core modules when it inherits a
+ * PSModulePath from PowerShell 7 (which happens whenever the MCP client was
+ * launched from pwsh), so pin it to the 5.1 system module directory.
+ */
+function powershellEnv(): NodeJS.ProcessEnv {
+  const systemRoot = process.env.SystemRoot || process.env.SYSTEMROOT || "C:\\Windows";
+  return {
+    ...process.env,
+    PSModulePath: `${systemRoot}\\System32\\WindowsPowerShell\\v1.0\\Modules`,
+  };
 }
 
 function secretToolLookup(service: string, key: string): string | null {
@@ -87,7 +101,11 @@ try {
 }
 `;
   const encoded = Buffer.from(script, "utf16le").toString("base64");
-  return run("powershell.exe", ["-NoProfile", "-NonInteractive", "-EncodedCommand", encoded]);
+  return run(
+    "powershell.exe",
+    ["-NoProfile", "-NonInteractive", "-EncodedCommand", encoded],
+    powershellEnv()
+  );
 }
 
 /**

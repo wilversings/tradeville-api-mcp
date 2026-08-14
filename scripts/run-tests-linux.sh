@@ -17,4 +17,4 @@ eval "$(printf '\n' | gnome-keyring-daemon --unlock --components=secrets)"
 export GNOME_KEYRING_CONTROL
 
 node scripts/setup-test-credentials.mjs
-node --test --test-reporter=spec "tests/**/*.test.mjs"
+node scripts/run-tests.mjs
