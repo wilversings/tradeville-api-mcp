@@ -84,6 +84,11 @@ server.registerTool(
 async function main() {
   const transport = new StdioServerTransport();
   await server.connect(transport);
+  // A stdio client signals shutdown by closing our stdin. The transport only
+  // watches for `data` and `error`, so nothing else notices `end` — and the
+  // process lingers until the client gives up waiting and kills it.
+  process.stdin.on("end", shutdown);
+  process.stdin.on("close", shutdown);
 }
 
 function shutdown() {

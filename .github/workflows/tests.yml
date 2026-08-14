@@ -43,6 +43,12 @@ jobs:
         if: runner.os != 'Linux'
         run: npm run test:setup
 
+      # Temporary: locating per-stage slowness that only reproduces on a runner.
+      - name: Stage timings
+        if: runner.os == 'Windows'
+        run: node scripts/diagnose-timings.mjs
+        timeout-minutes: 5
+
       - name: Run integration tests
         if: runner.os != 'Linux'
         run: npm run test:integration

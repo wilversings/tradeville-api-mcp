@@ -18,10 +18,16 @@ if (!existsSync(SERVER_ENTRY)) {
 
 // StdioClientTransport replaces the child's environment wholesale, so whatever
 // the credential backends need must be forwarded by hand.
+// Superset of the SDK's own DEFAULT_INHERITED_ENV_VARS: a thin Windows
+// environment makes PowerShell startup pathologically slow, and the credential
+// backend spawns it.
 const PASSTHROUGH_ENV = [
   "PATH", "Path", "PATHEXT",
-  "APPDATA", "LOCALAPPDATA", "SystemRoot", "SYSTEMROOT", "windir", "COMSPEC",
-  "PSModulePath", "USERPROFILE", "HOMEDRIVE", "HOMEPATH", "TEMP", "TMP",
+  "APPDATA", "LOCALAPPDATA", "SystemRoot", "SYSTEMROOT", "SYSTEMDRIVE",
+  "windir", "COMSPEC", "PSModulePath", "PROCESSOR_ARCHITECTURE",
+  "PROGRAMFILES", "PROGRAMFILES(X86)", "PROGRAMDATA", "ALLUSERSPROFILE",
+  "USERNAME", "USERDOMAIN", "USERPROFILE", "HOMEDRIVE", "HOMEPATH",
+  "TEMP", "TMP", "NUMBER_OF_PROCESSORS", "OS",
   "HOME",
   "DBUS_SESSION_BUS_ADDRESS", "XDG_RUNTIME_DIR", "GNOME_KEYRING_CONTROL",
 ];
