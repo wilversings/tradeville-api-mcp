@@ -1,6 +1,5 @@
-// Failure paths. The server is expected to turn every one of these into a
-// readable MCP error rather than hanging, crashing, or returning a result that
-// looks successful.
+// Failure paths: each must become a readable MCP error, not a hang, a crash,
+// or a result that looks successful.
 
 import test, { describe } from "node:test";
 import assert from "node:assert/strict";
@@ -27,7 +26,7 @@ describe("API errors", () => {
       harness.mock.setResponse("Symbol", { cmd: "Symbol", err: "temporar indisponibil" });
       await callToolExpectingError(harness.client, "get_symbol", { symbol: "BRD" });
 
-      // A different tool must still work on the same connection.
+      // Same connection, different tool.
       const ok = await callTool(harness.client, "get_fx_rates", {
         dstart: "2024-01-03",
         dend: "2024-01-05",

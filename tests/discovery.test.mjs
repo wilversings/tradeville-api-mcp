@@ -1,6 +1,5 @@
 // The server's advertised surface: handshake metadata and the tool catalogue.
-// These need no credentials and no API, so they cover every platform even if a
-// secret store is unavailable.
+// Needs neither credentials nor an API.
 
 import test, { after, before, describe } from "node:test";
 import assert from "node:assert/strict";
@@ -58,8 +57,7 @@ describe("discovery", () => {
   test("every tool has a description documenting its returned columns", () => {
     for (const tool of tools) {
       assert.ok(tool.description, `${tool.name} has no description`);
-      // Models cannot know the response shape ahead of a call, so each
-      // description is expected to spell the columns out.
+      // Models cannot know the response shape ahead of a call.
       assert.match(tool.description, /Returns rows with|Returns|Get /, tool.name);
     }
   });

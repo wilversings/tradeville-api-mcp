@@ -5,11 +5,15 @@
 import { build } from "esbuild";
 import { chmodSync, cpSync, mkdirSync, rmSync } from "node:fs";
 import { execFileSync } from "node:child_process";
+import { createRequire } from "node:module";
 
 rmSync("dist", { recursive: true, force: true });
 mkdirSync("dist", { recursive: true });
 
-execFileSync("tsc", ["--noEmit"], { stdio: "inherit" });
+// Run tsc's JS entrypoint directly: the .bin shim is tsc.cmd on Windows, which
+// execFileSync refuses to spawn without a shell.
+const tsc = createRequire(import.meta.url).resolve("typescript/bin/tsc");
+execFileSync(process.execPath, [tsc, "--noEmit"], { stdio: "inherit" });
 
 await build({
   entryPoints: ["src/index.ts"],

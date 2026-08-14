@@ -1,5 +1,4 @@
-// Behaviour of the WebSocket client underneath the tools: the invariants in
-// AGENTS.md that are easy to break and hard to notice — request serialization,
+// WebSocket client invariants underneath the tools: request serialization,
 // transparent reconnect, and the two response envelope shapes.
 
 import test, { describe } from "node:test";
@@ -19,8 +18,8 @@ describe("connection handling", () => {
   });
 
   test("serializes concurrent tool calls, one request in flight at a time", async () => {
-    // The API correlates responses positionally, not by id, so overlapping
-    // requests would hand each caller someone else's data.
+    // Responses correlate positionally, not by id, so overlap would hand each
+    // caller someone else's data.
     const harness = await startHarness({ responseDelayMs: 25 });
     try {
       const symbols = ["BRD", "TLV", "SNP", "FP", "EL"];
@@ -51,14 +50,13 @@ describe("connection handling", () => {
       assert.equal(harness.mock.connectionCount, 1);
 
       harness.mock.dropConnections();
-      // Let the close event propagate to the server's client.
-      await new Promise((resolve) => setTimeout(resolve, 250));
+      await new Promise((resolve) => setTimeout(resolve, 250)); // let close propagate
 
       const rows = jsonOf(await callTool(harness.client, "get_symbol", { symbol: "TLV" }));
       assert.deepEqual([...new Set(rows.map((row) => row.Symbol))], ["TLV"]);
 
       assert.equal(harness.mock.connectionCount, 2, "should have dialled again");
-      assert.equal(harness.mock.requestsFor("login").length, 2, "should log in on the new connection");
+      assert.equal(harness.mock.requestsFor("login").length, 2, "should log in again");
     } finally {
       await harness.close();
     }
@@ -104,7 +102,7 @@ describe("response envelope shapes", () => {
   });
 
   test("transposes tabular data sent at the top level", async () => {
-    // The upstream docs show this shape; the live API uses `data`. Both work.
+    // The shape the upstream docs show; the live API uses `data`. Both work.
     const harness = await startHarness();
     try {
       harness.mock.setResponse("Symbol", {

@@ -87,6 +87,25 @@ npx @modelcontextprotocol/inspector --cli node dist/index.js --method tools/call
 
 ## Conventions
 
+### Comments
+
+Keep them minimal. Most code should carry none.
+
+- Comment the code, not the change. A comment explains what is there now, for someone reading it
+  cold. It is not a changelog: no "new", "now uses", "previously", "fixed", "added X so that", no
+  reference to what the code used to do or to the task that prompted the edit. Git history covers
+  that.
+- Write them only for what the code cannot say itself: a non-obvious *why*, an upstream quirk being
+  worked around, an invariant that looks safe to break but isn't. Prefer fixing an unclear name over
+  explaining it.
+- Never restate the code (`// loop over the rows`), label the obvious, or narrate a function
+  step-by-step.
+- One or two lines. If a comment needs a paragraph, it usually belongs in this file or the README.
+- Same rules in tests. A test name should carry the intent; a comment is for why the assertion is
+  non-obvious.
+
+### Code
+
 - Tools are named `snake_case`; API commands (`cmd` field) are the API's own `PascalCase`/mixed
   casing — don't rename the latter to match the former, it must match what the API expects.
 - Tool descriptions should document the returned columns (models don't otherwise know the response

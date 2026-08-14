@@ -1,16 +1,7 @@
 #!/usr/bin/env node
-// Provisions the integration tests' fixture credentials into the native OS
-// secret store, using the same backend src/credentials.ts reads from:
-//
-//   Linux    freedesktop Secret Service, via `secret-tool`
-//   macOS    a dedicated keychain on the user's search list, via `security`
-//   Windows  DPAPI-encrypted files under %APPDATA%, via PowerShell
-//
-// It writes under the "tradeville-api-mcp-test" namespace, never the real
-// "tradeville-api-mcp" one, so running it cannot clobber your own credentials.
-//
-// It reads the values back afterwards, so a locked or unavailable secret store
-// fails here with a clear message instead of deep inside a spawned server.
+// Provisions the tests' fixture credentials into the native OS secret store,
+// using the same backends src/credentials.ts reads from. Writes under the
+// test namespace only, never the real one, then reads back to verify.
 //
 // Usage: node scripts/setup-test-credentials.mjs
 
@@ -27,9 +18,8 @@ import {
 const IS_WINDOWS = process.platform === "win32";
 const IS_MACOS = process.platform === "darwin";
 
-// Dedicated keychain rather than the login one: CI runners do not hand out the
-// login keychain password, and this keeps test fixtures out of a developer's
-// personal keychain.
+// Dedicated keychain: CI runners do not hand out the login keychain password,
+// and this keeps fixtures out of a developer's personal keychain.
 const MACOS_KEYCHAIN = "tradeville-test.keychain-db";
 const MACOS_KEYCHAIN_PASSWORD = "tradeville-test";
 
@@ -52,8 +42,8 @@ function run(command, args, { input, allowFailure = false } = {}) {
 }
 
 function setupLinux() {
-  // secret-tool has no --version; a bare invocation prints usage and exits 0,
-  // so spawn failure (ENOENT) is what actually tells us it is missing.
+  // No --version flag; a bare call prints usage and exits 0, so ENOENT from the
+  // spawn itself is the only signal that it is missing.
   const check = run("secret-tool", [], { allowFailure: true });
   if (check.error) {
     fail(
@@ -74,25 +64,22 @@ function setupLinux() {
 }
 
 function setupMacos() {
-  // Absolute path throughout: `security` resolving a bare keychain name is
-  // version-dependent (and silently appends -db), which makes the search-list
-  // comparison below unreliable.
+  // Absolute path throughout: `security` resolving a bare name is
+  // version-dependent and silently appends -db, breaking the comparison below.
   const keychain = path.join(homedir(), "Library", "Keychains", MACOS_KEYCHAIN);
 
   const listed = run("security", ["list-keychains", "-d", "user"]).stdout;
   const existing = [...listed.matchAll(/"([^"]+)"/g)].map((m) => m[1]);
 
-  // create-keychain fails if it already exists, which is fine on a re-run.
+  // Fails if it already exists, which is fine on a re-run.
   run("security", ["create-keychain", "-p", MACOS_KEYCHAIN_PASSWORD, keychain], {
     allowFailure: true,
   });
   run("security", ["unlock-keychain", "-p", MACOS_KEYCHAIN_PASSWORD, keychain]);
-  // No auto-lock: an idle-locked keychain would make lookups fail mid-run.
+  // No auto-lock: an idle-locked keychain would fail lookups mid-run.
   run("security", ["set-keychain-settings", keychain]);
 
-  // find-generic-password only searches the keychains on the search list, so
-  // the new one has to join it — keeping the existing entries, which include
-  // the user's login keychain.
+  // find-generic-password only searches keychains on the search list.
   if (!existing.includes(keychain)) {
     run("security", ["list-keychains", "-d", "user", "-s", keychain, ...existing]);
   }
@@ -101,8 +88,8 @@ function setupMacos() {
     ["user", TEST_USER],
     ["pass", TEST_PASS],
   ]) {
-    // -U updates an existing item instead of erroring; -A skips the ACL prompt,
-    // which would otherwise block on a headless CI runner.
+    // -U updates rather than erroring; -A skips the ACL prompt, which would
+    // block a headless runner.
     run("security", [
       "add-generic-password",
       "-U",
@@ -129,9 +116,8 @@ function setupWindows() {
     ["user", TEST_USER],
     ["pass", TEST_PASS],
   ]) {
-    // Same DPAPI format the README's Read-Host recipe produces, just written
-    // non-interactively. The value travels via an env var rather than being
-    // spliced into the script text.
+    // Same DPAPI format the README's Read-Host recipe produces. The value
+    // travels via an env var rather than being spliced into the script.
     const script = `
 $ErrorActionPreference = 'Stop'
 $path = Join-Path $env:APPDATA '${TEST_SERVICE}\\${key}.dat'
@@ -154,9 +140,8 @@ ConvertTo-SecureString -String $env:TDV_TEST_VALUE -AsPlainText -Force |
 }
 
 /**
- * Reads the credentials straight back out, issuing the same lookup commands
- * src/credentials.ts does. This turns a locked or missing secret store into a
- * clear failure here, rather than an opaque one inside a spawned MCP server.
+ * Reads back with the same lookups src/credentials.ts uses, so a locked or
+ * missing store fails here rather than opaquely inside a spawned server.
  */
 function verify() {
   const lookup = IS_WINDOWS ? readWindows : IS_MACOS ? readMacos : readLinux;

@@ -1,7 +1,5 @@
-// Spawns the built MCP server (dist/index.js) as a real child process, talks to
-// it over stdio with the MCP SDK's own client, and points it at a local mock of
-// the Tradeville WebSocket API. Nothing is stubbed inside the server: every
-// assertion goes through the actual MCP protocol and the actual server binary.
+// Spawns the built server as a child process and drives it over stdio with the
+// MCP SDK's own client, pointed at a local mock of the Tradeville API.
 
 import { fileURLToPath } from "node:url";
 import path from "node:path";
@@ -18,57 +16,35 @@ if (!existsSync(SERVER_ENTRY)) {
   throw new Error(`Missing ${SERVER_ENTRY}. Run "npm run build" before the integration tests.`);
 }
 
-/**
- * Environment for the server child process. StdioClientTransport replaces the
- * environment wholesale, so anything the server genuinely needs has to be
- * forwarded explicitly — PATH to find `secret-tool`/`security`, APPDATA and
- * SystemRoot for the Windows DPAPI lookup, and the D-Bus address so a
- * `secret-tool` spawned from the child reaches the same keyring the test
- * session unlocked.
- */
-function serverEnv(overrides) {
-  const passthrough = [
-    // Finding the helper binaries (secret-tool, security, powershell.exe).
-    "PATH",
-    "Path",
-    "PATHEXT",
-    // Windows: where DPAPI-encrypted files live, plus what PowerShell needs to
-    // start at all under -NoProfile.
-    "APPDATA",
-    "LOCALAPPDATA",
-    "SystemRoot",
-    "SYSTEMROOT",
-    "windir",
-    "COMSPEC",
-    "PSModulePath",
-    "USERPROFILE",
-    "HOMEDRIVE",
-    "HOMEPATH",
-    "TEMP",
-    "TMP",
-    // macOS: resolving the user's keychain search list.
-    "HOME",
-    // Linux: reaching the same keyring the test session unlocked.
-    "DBUS_SESSION_BUS_ADDRESS",
-    "XDG_RUNTIME_DIR",
-    "GNOME_KEYRING_CONTROL",
-  ];
+// StdioClientTransport replaces the child's environment wholesale, so whatever
+// the credential backends need must be forwarded by hand.
+const PASSTHROUGH_ENV = [
+  "PATH", "Path", "PATHEXT",
+  "APPDATA", "LOCALAPPDATA", "SystemRoot", "SYSTEMROOT", "windir", "COMSPEC",
+  "PSModulePath", "USERPROFILE", "HOMEDRIVE", "HOMEPATH", "TEMP", "TMP",
+  "HOME",
+  "DBUS_SESSION_BUS_ADDRESS", "XDG_RUNTIME_DIR", "GNOME_KEYRING_CONTROL",
+];
 
+function serverEnv(overrides) {
   const env = {};
-  for (const key of passthrough) {
-    if (process.env[key] !== undefined) env[key] = process.env[key];
+  const seen = new Set();
+  for (const key of PASSTHROUGH_ENV) {
+    // Windows env lookups are case-insensitive, so PATH and Path both resolve;
+    // emitting both would put duplicate keys in the child's environment block.
+    const canonical = key.toLowerCase();
+    if (seen.has(canonical) || process.env[key] === undefined) continue;
+    seen.add(canonical);
+    env[key] = process.env[key];
   }
   return { ...env, ...overrides };
 }
 
 /**
- * Starts a mock API + a server connected to it.
- *
  * @param {object} [options]
- * @param {string} [options.credentialService] Secret-store namespace the server
- *   reads. Defaults to the provisioned test namespace; pass an unprovisioned
- *   name to exercise the "credentials missing" path.
- * @param {boolean} [options.startMock] Set false to skip the mock entirely.
+ * @param {string} [options.credentialService] Secret-store namespace to read;
+ *   pass an unprovisioned one to exercise the missing-credentials path.
+ * @param {boolean} [options.startMock] Set false to run with no API at all.
  * @param {number} [options.responseDelayMs] Artificial mock latency.
  * @param {Record<string,string>} [options.env] Extra child-process env vars.
  */
@@ -88,13 +64,11 @@ export async function startHarness(options = {}) {
     command: process.execPath,
     args: [SERVER_ENTRY],
     cwd: REPO_ROOT,
-    // Surface server crashes in the test output instead of swallowing them.
     stderr: "inherit",
     env: serverEnv({
       TRADEVILLE_CREDENTIAL_SERVICE: credentialService,
-      // A port nothing listens on when the mock is off, so an accidental live
-      // connection attempt fails fast and loudly rather than reaching the
-      // real API.
+      // Dead port without a mock, so a stray connection fails instead of
+      // reaching the live API.
       TRADEVILLE_WS_URL: mock ? mock.url : "ws://127.0.0.1:1",
       ...extraEnv,
     }),
@@ -123,14 +97,9 @@ export async function callTool(client, name, args = {}) {
 }
 
 /**
- * Calls a tool expecting it to fail, and returns the failure message.
- *
- * A failure reaches the caller one of two ways depending on where it came from:
- * the server's own handlers return `isError` results, while protocol-level
- * faults (unknown tool, schema validation) start as JSON-RPC errors, which the
- * SDK may either reject with or fold into an `isError` result. Both count as
- * failure here, so these tests assert on behaviour rather than on which of the
- * two shapes the SDK currently picks.
+ * Returns the failure message, whether the SDK rejected or folded the fault
+ * into an `isError` result — it does the latter for protocol-level errors
+ * today, but that is not a guarantee worth pinning tests to.
  */
 export async function callToolExpectingError(client, name, args = {}) {
   let result;

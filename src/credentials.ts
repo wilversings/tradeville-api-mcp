@@ -7,16 +7,12 @@ const IS_WINDOWS = process.platform === "win32";
 const IS_MACOS = process.platform === "darwin";
 
 /**
- * Namespace the credentials are stored under (secret-service attribute on
- * Linux, keychain service on macOS, `%APPDATA%` subdirectory on Windows).
- * Overridable so the integration tests can use a throwaway namespace instead of
- * clobbering a developer's real stored credentials. It is a lookup key, never a
- * secret — the password itself is still only ever read from the OS secret store.
+ * Namespace the credentials are stored under. Overridable so the integration
+ * tests can use a throwaway namespace; it is a lookup key, never a secret.
  *
- * The Windows backend splices this into a PowerShell script, so it must not be
- * arbitrary shell text; a conservative identifier charset keeps that safe. This
- * is resolved lazily (not at module load) so a bad value surfaces as a tool-call
- * error rather than crashing the server before the MCP handshake completes.
+ * Resolved lazily, so a bad value surfaces as a tool-call error rather than
+ * crashing the server before the MCP handshake completes. The charset is
+ * restricted because the Windows backend splices this into a PowerShell script.
  */
 function resolveService(): string {
   const override = process.env.TRADEVILLE_CREDENTIAL_SERVICE?.trim();
@@ -63,25 +59,19 @@ function run(command: string, args: string[]): string | null {
   }
 }
 
-/** Linux: freedesktop Secret Service / KWallet, via `secret-tool`. */
 function secretToolLookup(service: string, key: string): string | null {
   return run("secret-tool", ["lookup", "service", service, "key", key]);
 }
 
-/**
- * macOS: the keychain, via `security` (`-w` prints only the password). Lookups
- * go through the user's keychain search list, so an item in any keychain on
- * that list resolves, not just the login one.
- */
+/** Searches the user's keychain search list, not just the login keychain. */
 function keychainLookup(service: string, key: string): string | null {
   return run("security", ["find-generic-password", "-s", service, "-a", key, "-w"]);
 }
 
 /**
- * `key` is always our own "user"/"pass" literal and `service` is validated
- * against a conservative charset in `resolveService`, so splicing them into the
- * script is safe. The script itself travels via -EncodedCommand (base64
- * UTF-16LE) rather than -Command to sidestep cmd/PowerShell quoting entirely.
+ * `key` is our own literal and `service` is charset-validated, so splicing them
+ * in is safe. -EncodedCommand (base64 UTF-16LE) sidesteps cmd/PowerShell
+ * quoting entirely.
  */
 function dpapiLookup(service: string, key: "user" | "pass"): string | null {
   const script = `
@@ -101,14 +91,14 @@ try {
 }
 
 /**
- * Resolves Tradeville credentials straight from the OS secret store —
- * freedesktop Secret Service / KWallet via `secret-tool` on Linux, the keychain
- * via `security` on macOS, DPAPI (via PowerShell) on Windows — so a real
- * account's password never needs to sit in an MCP client config file or an
- * environment variable. Throws if nothing (or only half of the pair) is stored;
- * callers should surface that lazily (e.g. on first tool call) rather than at
- * startup, since a crashed server before the MCP handshake completes just shows
- * a generic "Connection closed" with no detail.
+ * Reads the credentials from the OS secret store — Secret Service via
+ * `secret-tool` on Linux, the keychain via `security` on macOS, DPAPI via
+ * PowerShell on Windows — so a real password never sits in an MCP client config
+ * file or an environment variable.
+ *
+ * Throws if nothing (or only half the pair) is stored. Callers should surface
+ * that lazily, on first tool call: crashing before the MCP handshake completes
+ * shows the user only a generic "Connection closed".
  */
 export function resolveCredentials(): TradevilleConfig {
   const service = resolveService();

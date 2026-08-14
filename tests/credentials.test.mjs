@@ -1,10 +1,6 @@
-// The one part of this server that is genuinely different on every platform:
-// reading the username and password out of the OS secret store (secret-tool on
-// Linux, the keychain on macOS, DPAPI on Windows).
-//
-// These tests assert on what the server actually put on the wire, so they only
-// pass if the real per-platform backend read the real stored values back.
-// scripts/setup-test-credentials.mjs provisions them first.
+// The only part of the server that differs per platform. These assert on what
+// the server put on the wire, so they pass only if the native backend really
+// read the values scripts/setup-test-credentials.mjs stored.
 
 import test, { describe } from "node:test";
 import assert from "node:assert/strict";
@@ -34,7 +30,6 @@ describe("credentials from the OS secret store", () => {
       assert.match(message, /credentials are not set up/i);
       assert.match(message, new RegExp(UNCONFIGURED_SERVICE));
 
-      // The hint has to name the right tool for the platform it is running on.
       const expected =
         process.platform === "win32"
           ? /ConvertFrom-SecureString/
@@ -79,7 +74,7 @@ describe("credentials from the OS secret store", () => {
   });
 
   test("rejects a credential namespace that could escape into a shell", async () => {
-    // The Windows backend splices this name into a PowerShell script.
+    // The Windows backend splices this into a PowerShell script.
     const harness = await startHarness({ credentialService: "bad name; rm -rf" });
     try {
       const message = await callToolExpectingError(harness.client, "get_portfolio", {});

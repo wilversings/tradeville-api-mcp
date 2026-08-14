@@ -1,24 +1,16 @@
-// A local stand-in for the Tradeville WebSocket API (wss://api.tradeville.ro:443,
-// subprotocol "apitv"). It speaks the same request/response shape the real API
-// does, so the MCP server under test can be exercised end to end without
-// touching the live service:
+// Local stand-in for the Tradeville WebSocket API:
 //
 //   client -> {"cmd":"Portfolio","prm":{"data":null}}
-//   server -> {"cmd":"Portfolio","prm":{...},"data":{"Symbol":[...],"Quantity":[...]}}
+//   server -> {"cmd":"Portfolio","prm":{...},"data":{"Symbol":[...],...}}
 //
-// Responses are written in the order requests arrive, matching the real API's
-// positional (not id-based) correlation — which is what makes the client's
-// request serialization worth testing.
+// Responses go out in arrival order, matching the real API's positional (not
+// id-based) correlation.
 
 import { WebSocketServer } from "ws";
 
 export const PROTOCOL = "apitv";
 
-/**
- * Columnar fixtures keyed by API command, using the column names each tool's
- * description promises. Deliberately more than one row so the columnar ->
- * row-object transposition is actually exercised.
- */
+/** Columnar fixtures per command, using the columns each tool description promises. */
 export const FIXTURES = {
   Portfolio: {
     Account: ["DEMO1", "DEMO1", "DEMO1"],
@@ -123,9 +115,8 @@ export const FIXTURES = {
 export async function startMockTradeville(options = {}) {
   const { user, pass, responseDelayMs = 0 } = options;
 
-  /** Every {cmd, prm} the mock received, in arrival order, across connections. */
+  /** Every {cmd, prm} received, in arrival order, across connections. */
   const requests = [];
-  /** Per-command response overrides installed by a test. */
   const overrides = new Map();
   const sockets = new Set();
   let connectionCount = 0;
@@ -181,8 +172,7 @@ export async function startMockTradeville(options = {}) {
     const override = overrides.get(cmd);
     if (override !== undefined) {
       const value = typeof override === "function" ? await override(prm) : override;
-      // An override may return null to mean "stay silent" (drives the timeout path).
-      return value === null ? undefined : value;
+      return value === null ? undefined : value; // null means stay silent
     }
 
     if (cmd === "login") {
@@ -198,11 +188,7 @@ export async function startMockTradeville(options = {}) {
     return { cmd, prm, data: echoSymbol(fixture, prm) };
   }
 
-  /**
-   * Reflects the requested symbol back into the fixture's Symbol column so a
-   * test can tell which request a given response belongs to — that is what
-   * makes response-ordering bugs visible rather than silently passing.
-   */
+  /** Echoes the requested symbol back so tests can tell responses apart. */
   function echoSymbol(fixture, prm) {
     const symbol = prm?.symbol;
     if (typeof symbol !== "string" || !Array.isArray(fixture.Symbol)) return fixture;
@@ -214,15 +200,12 @@ export async function startMockTradeville(options = {}) {
   return {
     url: `ws://127.0.0.1:${port}`,
     requests,
-    /** Only the commands, which is usually all an assertion cares about. */
     get commands() {
       return requests.map((r) => r.cmd);
     },
-    /** Requests for one command, in arrival order. */
     requestsFor(cmd) {
       return requests.filter((r) => r.cmd === cmd);
     },
-    /** The single request for `cmd`; throws unless there was exactly one. */
     onlyRequestFor(cmd) {
       const matches = this.requestsFor(cmd);
       if (matches.length !== 1) {
@@ -230,14 +213,14 @@ export async function startMockTradeville(options = {}) {
       }
       return matches[0];
     },
-    /** Replace the response for a command with a fixed value or a function of `prm`. */
+    /** Response override: a fixed value, or a function of `prm`. */
     setResponse(cmd, response) {
       overrides.set(cmd, response);
     },
     get connectionCount() {
       return connectionCount;
     },
-    /** High-water mark of concurrently-processing requests seen by the mock. */
+    /** High-water mark of concurrently-processing requests. */
     get maxInFlight() {
       return maxInFlight;
     },
@@ -245,7 +228,6 @@ export async function startMockTradeville(options = {}) {
     get rejectedProtocol() {
       return rejectedProtocol;
     },
-    /** Simulates the API dropping the connection, to exercise reconnect. */
     dropConnections() {
       for (const socket of sockets) socket.terminate();
       sockets.clear();

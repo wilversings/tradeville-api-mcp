@@ -12,9 +12,7 @@ jobs:
     runs-on: ${{ matrix.os }}
     timeout-minutes: 15
     strategy:
-      # Report every platform's result, rather than cancelling the others on
-      # the first failure — the point of the matrix is spotting OS-specific
-      # breakage, most often in the credential backend.
+      # Report every platform, rather than cancelling the rest on first failure.
       fail-fast: false
       matrix:
         os: [ubuntu-latest, macos-latest, windows-latest]
@@ -31,14 +29,12 @@ jobs:
 
       - run: npm run build
 
-      # The tests read credentials through the platform's real secret store, so
-      # Linux needs a Secret Service provider that a headless runner lacks.
+      # Headless runners have no Secret Service provider for secret-tool.
       - name: Install Secret Service provider
         if: runner.os == 'Linux'
         run: sudo apt-get update && sudo apt-get install -y libsecret-tools gnome-keyring dbus-x11
 
-      # Provisioning and the tests share one D-Bus session: the MCP server under
-      # test shells out to secret-tool itself, so it must inherit the same bus.
+      # One D-Bus session for both, since the server spawns secret-tool itself.
       - name: Provision credentials and run integration tests
         if: runner.os == 'Linux'
         run: dbus-run-session -- ./scripts/run-tests-linux.sh

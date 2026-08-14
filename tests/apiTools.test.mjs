@@ -1,9 +1,7 @@
-// Every API-backed tool, end to end: MCP tool call -> Tradeville command +
-// params on the wire -> columnar response -> row objects in the tool result.
-//
-// Each case pins both directions, because the two failure modes are different:
-// a wrong `prm` mapping silently asks the API the wrong question, while a wrong
-// response shape hands the model a table it cannot read.
+// Every API-backed tool, end to end: MCP call -> command + params on the wire
+// -> columnar response -> row objects. Both directions matter: a wrong `prm`
+// asks the API the wrong question, a wrong shape hands the model an unreadable
+// table.
 
 import test, { after, before, describe } from "node:test";
 import assert from "node:assert/strict";
@@ -159,11 +157,9 @@ describe("API-backed tools", () => {
       assert.equal(rows.length, fixture[columns[0]].length, "row count");
       assert.deepEqual(Object.keys(rows[0]).sort(), [...columns].sort(), "row keys");
 
-      // Spot-check the transposition itself: row i must carry column value i.
       for (const column of columns) {
         const expected = fixture[column];
-        // The mock rewrites the Symbol column to echo the request, so compare
-        // against what it actually returned for that case.
+        // The mock rewrites Symbol to echo the request; skip it there.
         if (column === "Symbol" && typeof testCase.args.symbol === "string") continue;
         assert.deepEqual(
           rows.map((row) => row[column]),

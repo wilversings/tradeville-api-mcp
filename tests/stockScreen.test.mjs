@@ -1,14 +1,12 @@
-// get_stock_screen is the one tool backed by the bundled CSV snapshot rather
-// than the WebSocket API, so it must work with the API unreachable. Its file
-// path is resolved relative to the built bundle, which is exactly the kind of
-// thing that breaks on a platform with different path separators — hence
-// running this on all three.
+// The one tool backed by the bundled CSV rather than the API, so it must work
+// with the API unreachable. Its path is resolved relative to the built bundle,
+// which is the kind of thing that breaks on a different path separator.
 
 import test, { after, before, describe } from "node:test";
 import assert from "node:assert/strict";
 import { callTool, jsonOf, startHarness } from "./helpers/mcpHarness.mjs";
 
-/** Columns the tool's description promises callers. */
+/** Columns the tool description promises. */
 const EXPECTED_COLUMNS = [
   "Simbol", "Cotatie", "Capitalizare", "MedieZilnicaTranz", "VarYoY", "VarYTD",
   "BET_YTD", "BET_YoY", "VariatieCA", "VariatieProfitNet", "PE", "PBV",
@@ -22,7 +20,6 @@ describe("get_stock_screen", () => {
   let allRows;
 
   before(async () => {
-    // No mock: this tool must not touch the API at all.
     harness = await startHarness({ startMock: false });
     allRows = jsonOf(await callTool(harness.client, "get_stock_screen", {}));
   });
@@ -87,8 +84,6 @@ describe("get_stock_screen", () => {
   });
 
   test("works without any API connection", () => {
-    // startMock: false points the server at a dead port; reaching the network
-    // at all would have failed the calls above.
-    assert.equal(harness.mock, null);
+    assert.equal(harness.mock, null); // the calls above ran against a dead port
   });
 });
