@@ -6,6 +6,7 @@ import type { TradevilleConfig, TradevilleResponse, TradeParams } from "./types.
 const WS_URL = process.env.TRADEVILLE_WS_URL?.trim() || "wss://api.tradeville.ro:443";
 const PROTOCOL = "apitv";
 const REQUEST_TIMEOUT_MS = 15_000;
+const CONNECT_TIMEOUT_MS = 15_000;
 // Docs specify a limit of ~20 commands / 10s; keep well under that.
 const MIN_SPACING_MS = 150;
 
@@ -26,7 +27,8 @@ function sleep(ms: number): Promise<void> {
  */
 export class TradevilleClient {
   private config: TradevilleConfig | null = null;
-  private readonly credentialsError: string | null = null;
+  private credentialsError: string | null = null;
+  private credentialsResolved = false;
   private ws: WebSocket | null = null;
   private readyPromise: Promise<void> | null = null;
   private queue: PendingRequest[] = [];
@@ -36,13 +38,28 @@ export class TradevilleClient {
   constructor(config?: TradevilleConfig) {
     if (config) {
       this.config = config;
-      return;
+      this.credentialsResolved = true;
     }
-    try {
-      this.config = resolveCredentials();
-    } catch (err) {
-      this.credentialsError = err instanceof Error ? err.message : String(err);
+  }
+
+  /**
+   * Deferred to the first request: reading the secret store costs two
+   * synchronous PowerShell launches on Windows, which would otherwise delay
+   * every server start — and the MCP handshake with it — by seconds.
+   */
+  private resolveConfig(): TradevilleConfig {
+    if (!this.credentialsResolved) {
+      this.credentialsResolved = true;
+      try {
+        this.config = resolveCredentials();
+      } catch (err) {
+        this.credentialsError = err instanceof Error ? err.message : String(err);
+      }
     }
+    if (!this.config) {
+      throw new Error(this.credentialsError ?? "Tradeville credentials could not be resolved");
+    }
+    return this.config;
   }
 
   /** Send a command, connecting and logging in first if needed. */
@@ -69,14 +86,12 @@ export class TradevilleClient {
   }
 
   private async connectAndLogin(): Promise<void> {
-    if (!this.config) {
-      throw new Error(this.credentialsError ?? "Tradeville credentials could not be resolved");
-    }
+    const config = this.resolveConfig();
     await this.connect();
     const loginResp = await this.send("login", {
-      coduser: this.config.user,
-      parola: this.config.pass,
-      demo: this.config.demo,
+      coduser: config.user,
+      parola: config.pass,
+      demo: config.demo,
     });
     if (!loginResp.OK) {
       throw new Error(`Tradeville login failed: ${loginResp.err ?? "unknown error"}`);
@@ -88,14 +103,27 @@ export class TradevilleClient {
       const ws = new WebSocket(WS_URL, PROTOCOL);
       this.ws = ws;
 
-      const onOpen = () => {
+      // A host that drops the SYN rather than refusing it fires neither `open`
+      // nor `error`, and the request timeout only covers an established
+      // connection — so bound the attempt itself or a tool call hangs forever.
+      const cleanup = () => {
+        clearTimeout(timer);
+        ws.off("open", onOpen);
         ws.off("error", onError);
+      };
+      const onOpen = () => {
+        cleanup();
         resolve();
       };
       const onError = (err: Error) => {
-        ws.off("open", onOpen);
+        cleanup();
         reject(err);
       };
+      const timer = setTimeout(() => {
+        cleanup();
+        ws.terminate();
+        reject(new Error(`Tradeville connection to ${WS_URL} timed out`));
+      }, CONNECT_TIMEOUT_MS);
 
       ws.once("open", onOpen);
       ws.once("error", onError);

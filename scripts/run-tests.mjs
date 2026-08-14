@@ -20,9 +20,11 @@ if (files.length === 0) {
   process.exit(1);
 }
 
+// Per-test timeout so a hang is reported as a named failing test rather than
+// stalling the run until CI kills the job with no output at all.
 const { status, error } = spawnSync(
   process.execPath,
-  ["--test", "--test-reporter=spec", ...files],
+  ["--test", "--test-reporter=spec", "--test-timeout=60000", ...files],
   { stdio: "inherit" }
 );
 
