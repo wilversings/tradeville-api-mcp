@@ -1,0 +1,48 @@
+name: Tests
+
+on:
+  pull_request:
+  release:
+    types: [published]
+  workflow_dispatch:
+
+jobs:
+  integration:
+    name: integration (${{ matrix.os }})
+    runs-on: ${{ matrix.os }}
+    timeout-minutes: 15
+    strategy:
+      # Report every platform, rather than cancelling the rest on first failure.
+      fail-fast: false
+      matrix:
+        os: [ubuntu-latest, macos-latest, windows-latest]
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+
+      - run: npm ci
+
+      - run: npm run build
+
+      # Headless runners have no Secret Service provider for secret-tool.
+      - name: Install Secret Service provider
+        if: runner.os == 'Linux'
+        run: sudo apt-get update && sudo apt-get install -y libsecret-tools gnome-keyring dbus-x11
+
+      # One D-Bus session for both, since the server spawns secret-tool itself.
+      - name: Provision credentials and run integration tests
+        if: runner.os == 'Linux'
+        run: dbus-run-session -- ./scripts/run-tests-linux.sh
+
+      - name: Provision test credentials
+        if: runner.os != 'Linux'
+        run: npm run test:setup
+
+      - name: Run integration tests
+        if: runner.os != 'Linux'
+        run: npm run test:integration

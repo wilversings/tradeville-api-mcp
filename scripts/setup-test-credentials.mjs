@@ -1,0 +1,213 @@
+#!/usr/bin/env node
+// Provisions the tests' fixture credentials into the native OS secret store,
+// using the same backends src/credentials.ts reads from. Writes under the
+// test namespace only, never the real one, then reads back to verify.
+//
+// Usage: node scripts/setup-test-credentials.mjs
+
+import { execFileSync, spawnSync } from "node:child_process";
+import { mkdirSync } from "node:fs";
+import { homedir } from "node:os";
+import path from "node:path";
+import {
+  TEST_SERVICE,
+  TEST_USER,
+  TEST_PASS,
+} from "../tests/helpers/testCredentials.mjs";
+
+const IS_WINDOWS = process.platform === "win32";
+const IS_MACOS = process.platform === "darwin";
+
+// Dedicated keychain: CI runners do not hand out the login keychain password,
+// and this keeps fixtures out of a developer's personal keychain.
+const MACOS_KEYCHAIN = "tradeville-test.keychain-db";
+const MACOS_KEYCHAIN_PASSWORD = "tradeville-test";
+
+function fail(message, detail) {
+  console.error(`setup-test-credentials: ${message}`);
+  if (detail) console.error(detail.trim());
+  process.exit(1);
+}
+
+function run(command, args, { input, allowFailure = false } = {}) {
+  const result = spawnSync(command, args, { encoding: "utf8", input });
+  if (result.error) {
+    if (allowFailure) return result;
+    fail(`failed to run \`${command}\``, result.error.message);
+  }
+  if (!allowFailure && result.status !== 0) {
+    fail(`\`${command} ${args.join(" ")}\` exited with ${result.status}`, result.stderr);
+  }
+  return result;
+}
+
+function setupLinux() {
+  // No --version flag; a bare call prints usage and exits 0, so ENOENT from the
+  // spawn itself is the only signal that it is missing.
+  const check = run("secret-tool", [], { allowFailure: true });
+  if (check.error) {
+    fail(
+      "`secret-tool` is not available. Install libsecret-tools (Debian/Ubuntu) " +
+        "or libsecret (Fedora/Arch), and make sure a Secret Service provider " +
+        "(GNOME Keyring, KWallet) is running and unlocked."
+    );
+  }
+
+  for (const [key, value] of [
+    ["user", TEST_USER],
+    ["pass", TEST_PASS],
+  ]) {
+    run("secret-tool", ["store", "--label", `Tradeville test ${key}`, "service", TEST_SERVICE, "key", key], {
+      input: value,
+    });
+  }
+}
+
+function setupMacos() {
+  // Absolute path throughout: `security` resolving a bare name is
+  // version-dependent and silently appends -db, breaking the comparison below.
+  const keychain = path.join(homedir(), "Library", "Keychains", MACOS_KEYCHAIN);
+
+  const listed = run("security", ["list-keychains", "-d", "user"]).stdout;
+  const existing = [...listed.matchAll(/"([^"]+)"/g)].map((m) => m[1]);
+
+  // Fails if it already exists, which is fine on a re-run.
+  run("security", ["create-keychain", "-p", MACOS_KEYCHAIN_PASSWORD, keychain], {
+    allowFailure: true,
+  });
+  run("security", ["unlock-keychain", "-p", MACOS_KEYCHAIN_PASSWORD, keychain]);
+  // No auto-lock: an idle-locked keychain would fail lookups mid-run.
+  run("security", ["set-keychain-settings", keychain]);
+
+  // find-generic-password only searches keychains on the search list.
+  if (!existing.includes(keychain)) {
+    run("security", ["list-keychains", "-d", "user", "-s", keychain, ...existing]);
+  }
+
+  for (const [key, value] of [
+    ["user", TEST_USER],
+    ["pass", TEST_PASS],
+  ]) {
+    // -U updates rather than erroring; -A skips the ACL prompt, which would
+    // block a headless runner.
+    run("security", [
+      "add-generic-password",
+      "-U",
+      "-A",
+      "-s",
+      TEST_SERVICE,
+      "-a",
+      key,
+      "-w",
+      value,
+      keychain,
+    ]);
+  }
+}
+
+/** See powershellEnv() in src/credentials.ts — same pwsh-7 inheritance trap. */
+function powershellEnv(extra = {}) {
+  const systemRoot = process.env.SystemRoot || process.env.SYSTEMROOT || "C:\\Windows";
+  return {
+    ...process.env,
+    PSModulePath: `${systemRoot}\\System32\\WindowsPowerShell\\v1.0\\Modules`,
+    ...extra,
+  };
+}
+
+function setupWindows() {
+  const appData = process.env.APPDATA;
+  if (!appData) fail("APPDATA is not set; cannot locate the credential directory.");
+
+  const dir = path.join(appData, TEST_SERVICE);
+  mkdirSync(dir, { recursive: true });
+
+  for (const [key, value] of [
+    ["user", TEST_USER],
+    ["pass", TEST_PASS],
+  ]) {
+    // Same DPAPI format the README's Read-Host recipe produces. The value
+    // travels via an env var rather than being spliced into the script.
+    const script = `
+$ErrorActionPreference = 'Stop'
+$path = Join-Path $env:APPDATA '${TEST_SERVICE}\\${key}.dat'
+ConvertTo-SecureString -String $env:TDV_TEST_VALUE -AsPlainText -Force |
+  ConvertFrom-SecureString | Set-Content -Path $path
+`;
+    const encoded = Buffer.from(script, "utf16le").toString("base64");
+    const result = spawnSync(
+      "powershell.exe",
+      ["-NoProfile", "-NonInteractive", "-EncodedCommand", encoded],
+      { encoding: "utf8", env: powershellEnv({ TDV_TEST_VALUE: value }) }
+    );
+    if (result.error) {
+      fail("failed to run `powershell.exe`", result.error.message);
+    }
+    if (result.status !== 0) {
+      fail(`failed to store the ${key} credential via DPAPI`, result.stderr || result.stdout);
+    }
+  }
+}
+
+/**
+ * Reads back with the same lookups src/credentials.ts uses, so a locked or
+ * missing store fails here rather than opaquely inside a spawned server.
+ */
+function verify() {
+  const lookup = IS_WINDOWS ? readWindows : IS_MACOS ? readMacos : readLinux;
+  const user = lookup("user");
+  const pass = lookup("pass");
+
+  if (user !== TEST_USER || pass !== TEST_PASS) {
+    fail(
+      "stored credentials did not read back correctly " +
+        `(got user=${JSON.stringify(user)}, pass=${pass ? "<set>" : "<empty>"}). ` +
+        "The secret store is probably locked or unavailable."
+    );
+  }
+  console.log(`setup-test-credentials: OK (${process.platform}, service "${TEST_SERVICE}")`);
+}
+
+function readLinux(key) {
+  return tryRead("secret-tool", ["lookup", "service", TEST_SERVICE, "key", key]);
+}
+
+function readMacos(key) {
+  return tryRead("security", ["find-generic-password", "-s", TEST_SERVICE, "-a", key, "-w"]);
+}
+
+function readWindows(key) {
+  const script = `
+$ErrorActionPreference = 'Stop'
+$path = Join-Path $env:APPDATA '${TEST_SERVICE}\\${key}.dat'
+if (-not (Test-Path $path)) { exit 0 }
+$secure = Get-Content $path | ConvertTo-SecureString
+$bstr = [System.Runtime.InteropServices.Marshal]::SecureStringToBSTR($secure)
+try { [System.Runtime.InteropServices.Marshal]::PtrToStringAuto($bstr) }
+finally { [System.Runtime.InteropServices.Marshal]::ZeroFreeBSTR($bstr) }
+`;
+  const encoded = Buffer.from(script, "utf16le").toString("base64");
+  return tryRead(
+    "powershell.exe",
+    ["-NoProfile", "-NonInteractive", "-EncodedCommand", encoded],
+    powershellEnv()
+  );
+}
+
+function tryRead(command, args, env) {
+  try {
+    return execFileSync(command, args, {
+      encoding: "utf8",
+      stdio: ["ignore", "pipe", "ignore"],
+      ...(env ? { env } : {}),
+    }).trim();
+  } catch {
+    return null;
+  }
+}
+
+if (IS_WINDOWS) setupWindows();
+else if (IS_MACOS) setupMacos();
+else setupLinux();
+
+verify();
