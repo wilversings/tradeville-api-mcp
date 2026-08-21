@@ -47,17 +47,32 @@ then reconnect this MCP server (e.g. restart Claude Code, or use /mcp to reconne
 then reconnect this MCP server (e.g. restart Claude Code, or use /mcp to reconnect).`;
 }
 
+/**
+ * Runs a credential-store lookup, retrying once.
+ *
+ * The retry is not defensive padding. `secret-tool` occasionally exits
+ * non-zero with *empty stderr* when several lookups race for the Secret
+ * Service — measured at roughly one failure in two hundred concurrent
+ * lookups. Everything here treats a failed lookup as "no such credential", so
+ * without the retry a transient bus hiccup tells the user their credentials
+ * are not set up and asks them to store credentials that are already stored.
+ * One retry, not a loop: a store that is genuinely absent should answer
+ * immediately, not after a backoff.
+ */
 function run(command: string, args: string[], env?: NodeJS.ProcessEnv): string | null {
-  try {
-    const value = execFileSync(command, args, {
-      encoding: "utf8",
-      stdio: ["ignore", "pipe", "ignore"],
-      ...(env ? { env } : {}),
-    }).trim();
-    return value || null;
-  } catch {
-    return null;
+  for (let attempt = 0; attempt < 2; attempt++) {
+    try {
+      const value = execFileSync(command, args, {
+        encoding: "utf8",
+        stdio: ["ignore", "pipe", "ignore"],
+        ...(env ? { env } : {}),
+      }).trim();
+      return value || null;
+    } catch {
+      // Fall through to the retry; a second failure means genuinely absent.
+    }
   }
+  return null;
 }
 
 /**

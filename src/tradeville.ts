@@ -7,8 +7,24 @@ const WS_URL = process.env.TRADEVILLE_WS_URL?.trim() || "wss://api.tradeville.ro
 const PROTOCOL = "apitv";
 const REQUEST_TIMEOUT_MS = 15_000;
 const CONNECT_TIMEOUT_MS = 15_000;
-// Docs specify a limit of ~20 commands / 10s; keep well under that.
-const MIN_SPACING_MS = 150;
+/**
+ * The server enforces "maxim 20 comenzi in 10 secunde" and returns it as a
+ * regular `err` response, which fails the request rather than delaying it.
+ *
+ * Modelled as a sliding window rather than a fixed gap so that a short burst
+ * still goes out at full speed and only a sustained run slows down. This is
+ * the only place in the system that meters traffic: a client sweeping the
+ * whole listing quotes one symbol at a time and relies on it entirely.
+ *
+ * A fixed 150ms gap, which is what this was, is 67 requests per 10 seconds:
+ * over three times the limit. It survived only because round-trip latency
+ * padded it out, and stopped surviving the moment something started issuing
+ * one request per listed symbol.
+ */
+const RATE_WINDOW_MS = 10_000;
+const RATE_WINDOW_LIMIT = 18;
+/** Small floor between requests even inside the window's allowance. */
+const MIN_SPACING_MS = 60;
 
 interface PendingRequest {
   resolve: (value: TradevilleResponse) => void;
@@ -23,7 +39,8 @@ function sleep(ms: number): Promise<void> {
 /**
  * WebSocket client for the Tradeville API (https://api.tradeville.ro/).
  * Handles connect+login, and serializes all requests (one in-flight at a
- * time, with minimum spacing) to stay within the documented rate limit.
+ * time) behind a sliding-window rate limiter that keeps the connection
+ * inside the server's 20-commands-per-10-seconds budget.
  */
 export class TradevilleClient {
   private config: TradevilleConfig | null = null;
@@ -34,6 +51,8 @@ export class TradevilleClient {
   private queue: PendingRequest[] = [];
   private sendChain: Promise<TradevilleResponse | undefined> = Promise.resolve(undefined);
   private lastSendAt = 0;
+  /** Send timestamps inside the current rate window, oldest first. */
+  private sendTimes: number[] = [];
 
   constructor(config?: TradevilleConfig) {
     if (config) {
@@ -152,10 +171,7 @@ export class TradevilleClient {
       throw new Error("Tradeville connection is not open");
     }
 
-    const wait = MIN_SPACING_MS - (Date.now() - this.lastSendAt);
-    if (wait > 0) {
-      await sleep(wait);
-    }
+    await this.awaitRateWindow();
 
     return new Promise<TradevilleResponse>((resolve, reject) => {
       const timer = setTimeout(() => {
@@ -166,8 +182,26 @@ export class TradevilleClient {
 
       this.queue.push({ resolve, reject, timer });
       this.lastSendAt = Date.now();
+      this.sendTimes.push(this.lastSendAt);
       this.ws!.send(JSON.stringify({ cmd, prm }));
     });
+  }
+
+  /** Blocks until sending now would stay inside the server's 20-per-10s budget. */
+  private async awaitRateWindow(): Promise<void> {
+    for (;;) {
+      const now = Date.now();
+      while (this.sendTimes.length && now - this.sendTimes[0] >= RATE_WINDOW_MS) {
+        this.sendTimes.shift();
+      }
+      const spacingWait = MIN_SPACING_MS - (now - this.lastSendAt);
+      if (this.sendTimes.length < RATE_WINDOW_LIMIT) {
+        if (spacingWait > 0) await sleep(spacingWait);
+        return;
+      }
+      // Window is full: wait for the oldest send to age out of it.
+      await sleep(Math.max(RATE_WINDOW_MS - (now - this.sendTimes[0]) + 10, spacingWait, 10));
+    }
   }
 
   private handleMessage(raw: string): void {

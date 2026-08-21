@@ -42,6 +42,10 @@ Behind those questions, the server exposes these tools:
 | `get_fx_rates`     | Official BNR exchange rates for a currency                       |
 | `get_stock_screen` | Fundamental / valuation screening data for BVB stocks            |
 
+Every one of them forwards a single API call (except `get_stock_screen`, which reads a local
+export) and hands back the response as rows. The server reports what the broker says; it does not
+interpret it.
+
 ## Setup
 
 ### 1. Add it to your MCP client
@@ -116,8 +120,12 @@ them up, rather than failing silently.
 - **Dates** can be written either as the API's compact form (`"1oct20"`) or as ISO (`"2020-10-01"`).
 - **Results** come back as plain tables (arrays of row objects), ready for your assistant to read and
   summarize.
-- **Rate limits** are handled for you — requests are queued over a single connection and paced to stay
-  within Tradeville's limits, and the connection reconnects automatically if it drops.
+- **Rate limits** are handled for you — the API allows 20 commands per 10 seconds, and requests are
+  queued over a single connection behind a sliding-window limiter that keeps you inside it. Short
+  bursts still go at full speed; long sweeps (like a client asking for a quote on every listed
+  symbol) pace themselves. The connection reconnects automatically if it drops.
+- **The API allows two connections per account.** Running this server alongside another MCP client
+  uses both; a third will be refused until one closes.
 - **No live streaming.** For a current price, ask for a quote (`get_symbol`) on demand; continuous
   push updates don't fit MCP's request/response model.
 - **Stock-screen data** (`get_stock_screen`) is a periodically refreshed export from the stock

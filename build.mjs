@@ -1,7 +1,13 @@
 #!/usr/bin/env node
-// Type-checks the project, then bundles+minifies it into a single self-contained
-// dist/index.js with esbuild (bundling pulls in dependencies too, so tree shaking
-// can actually drop the unused parts of them).
+// One output: dist/index.js, the MCP server binary. Bundled and minified into
+// a single self-contained file so `npx tradeville-api-mcp` starts without
+// installing anything transitive.
+//
+// This package publishes a server and nothing else — no library entry point,
+// no exports map. Everything in src/ exists to serve a tool, and every tool
+// forwards one API command or reads one local file. Analysis built on top of
+// those tools belongs to whatever is calling them, not to this package — see
+// wilversings/bond-ladder-web for an example client.
 import { build } from "esbuild";
 import { chmodSync, cpSync, mkdirSync, rmSync } from "node:fs";
 import { execFileSync } from "node:child_process";

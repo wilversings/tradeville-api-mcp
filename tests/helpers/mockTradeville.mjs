@@ -117,6 +117,8 @@ export async function startMockTradeville(options = {}) {
 
   /** Every {cmd, prm} received, in arrival order, across connections. */
   const requests = [];
+  /** Arrival timestamp of each, positionally aligned with `requests`. */
+  const receivedAt = [];
   const overrides = new Map();
   const sockets = new Set();
   let connectionCount = 0;
@@ -153,6 +155,7 @@ export async function startMockTradeville(options = {}) {
         return;
       }
       requests.push(message);
+      receivedAt.push(Date.now());
 
       inFlight += 1;
       maxInFlight = Math.max(maxInFlight, inFlight);
@@ -200,6 +203,21 @@ export async function startMockTradeville(options = {}) {
   return {
     url: `ws://127.0.0.1:${port}`,
     requests,
+    receivedAt,
+    /**
+     * The most commands seen in any `windowMs` span. The API enforces its rate
+     * limit as an error response rather than a delay, so exceeding it fails
+     * requests outright — this is what a client must never do.
+     */
+    peakRate(windowMs) {
+      let peak = 0;
+      for (let i = 0; i < receivedAt.length; i++) {
+        let count = 0;
+        for (let j = i; j < receivedAt.length && receivedAt[j] - receivedAt[i] < windowMs; j++) count++;
+        peak = Math.max(peak, count);
+      }
+      return peak;
+    },
     get commands() {
       return requests.map((r) => r.cmd);
     },

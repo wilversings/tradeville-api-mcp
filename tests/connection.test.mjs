@@ -43,6 +43,35 @@ describe("connection handling", () => {
     }
   });
 
+  test("paces a long run of requests inside the API's command budget", async () => {
+    // "maxim 20 comenzi in 10 secunde" is enforced as an `err` response, not as
+    // a delay: exceed it and requests fail outright, mid-run, having already
+    // spent the caller's time. The client therefore meters itself with a
+    // sliding window rather than a fixed gap, so a short burst still goes at
+    // full speed and only a long run slows down.
+    //
+    // This test costs about ten seconds of wall clock, and cannot cost less:
+    // the window it is checking is ten seconds wide. That is the whole point —
+    // the previous fixed 150ms gap looked careful and was 67 requests per 10
+    // seconds, over three times the limit, and passed every faster test.
+    const harness = await startHarness();
+    try {
+      const symbols = Array.from({ length: 24 }, (_, i) => `SYM${i}`);
+      await Promise.all(symbols.map((symbol) => callTool(harness.client, "get_symbol", { symbol })));
+
+      assert.ok(
+        harness.mock.requests.length > 20,
+        `only ${harness.mock.requests.length} requests; the limiter was never exercised`
+      );
+      assert.ok(
+        harness.mock.peakRate(10_000) <= 20,
+        `${harness.mock.peakRate(10_000)} commands in a 10s window`
+      );
+    } finally {
+      await harness.close();
+    }
+  });
+
   test("reconnects and logs in again after the API drops the connection", async () => {
     const harness = await startHarness();
     try {

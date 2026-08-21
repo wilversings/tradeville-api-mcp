@@ -55,14 +55,18 @@ npx @modelcontextprotocol/inspector --cli node dist/index.js --method tools/call
   lazy connect+login, and a serialized request queue (one in-flight request at a time, with minimum
   spacing) that doubles as the rate-limit guard. Reconnects transparently on close/error.
 - [src/columnar.ts](src/columnar.ts) — transposes the API's columnar table format into row objects.
-- [src/tools.ts](src/tools.ts) — declarative tool definitions (name, description, zod schema, API
-  `cmd`, param mapping). Add a new Tradeville command by adding an entry here.
-- [src/index.ts](src/index.ts) — MCP server entrypoint; wires `tools.ts` definitions into
+- [src/apiTools.ts](src/apiTools.ts) — declarative tool definitions (name, description, zod schema,
+  API `cmd`, param mapping). Add a new Tradeville command by adding an entry here.
+- [src/index.ts](src/index.ts) — MCP server entrypoint; wires `apiTools.ts` definitions into
   `McpServer.registerTool()` over a stdio transport.
 - [src/credentials.ts](src/credentials.ts) — reads the username/password from the OS secret store,
   with one backend per platform (`secret-tool` on Linux, `security`/keychain on macOS, DPAPI via
   PowerShell on Windows). Never reads a secret from an env var or config file.
 - [src/types.ts](src/types.ts) — shared types for the raw API response shape.
+
+Every file in `src/` serves a tool, and every tool forwards one API command or reads one local
+file. That is the whole server. If a change adds arithmetic here, it is probably in the wrong
+repository half — see **Publishing surface** below.
 
 ## Important gotchas (learned the hard way)
 
@@ -84,6 +88,40 @@ npx @modelcontextprotocol/inspector --cli node dist/index.js --method tools/call
   MCP's request/response tool model. Don't add it without discussing the design (e.g. a
   collect-for-N-seconds snapshot tool) first.
 - Order placement is disabled by the API for live accounts and is out of scope for this project.
+- **The rate limit is real and enforced as an `err` response**, not as a delay: exceed it and you get
+  `"maxim 20 comenzi in 10 secunde"` and the request fails. `TradevilleClient` paces sends with a
+  sliding window (18 per 10s, leaving headroom), which is the *only* place in the system that meters
+  traffic — a client issuing one `get_symbol` per symbol across a ~500-symbol universe (e.g.
+  [bond-ladder-web](https://github.com/wilversings/bond-ladder-web)'s market screen) relies on it
+  entirely. Don't loosen it to make a caller faster, and don't add a second limiter in a client: it
+  could only ever be wrong about the budget this one is spending.
+- **`SearchSymbol` truncates** at roughly 33 rows with no indication it did, so `search_symbol` must
+  never be used to enumerate the market. The only call that lists the universe is `DailyValues` with
+  a null symbol over a single-day range, and even that omits anything that did not trade that
+  session. Say so in a tool description rather than assuming callers will discover it.
+
+## Publishing surface
+
+**This package publishes an MCP server and nothing else.** `build.mjs` emits one artefact,
+`dist/index.js`, bundled and minified so `npx tradeville-api-mcp` starts without installing anything
+transitive. There is no `exports` map beyond the binary and no library entry point, on purpose.
+
+The line this repository draws is between **the broker's data and an opinion about it**. A tool here
+forwards one API command and transposes the response; it does not decide what counts as a bond, how
+a coupon schedule is reconstructed from two dates, or which yields are trustworthy. Those are
+judgements — defensible ones, with a suite behind them — but they are *someone's*, and shipping them
+inside the server would make every consumer inherit them silently along with the data.
+
+So the test for whether something belongs in `src/` is: **could the broker have returned it?** A
+quote, a portfolio row, a BNR rate, yes. An inferred coupon frequency, a yield-to-maturity, a
+tax-adjusted swap recommendation, no — those belong to a downstream client, such as
+[bond-ladder-web](https://github.com/wilversings/bond-ladder-web) (formerly `web/` in this
+repository; extracted since it has its own dependencies, tests and release cycle).
+
+The cost of this is real and worth naming: an assistant talking to this server gets the API, not a
+bond ladder, and has to do the analysis itself or call a client app's endpoints. That is the trade
+that was chosen. If it ever needs revisiting, the fix is a new tool with a documented contract, not
+an `exports` map that lets a consumer reach into internals which are free to change.
 
 ## Conventions
 
@@ -109,7 +147,7 @@ Keep them minimal. Most code should carry none.
 - Tools are named `snake_case`; API commands (`cmd` field) are the API's own `PascalCase`/mixed
   casing — don't rename the latter to match the former, it must match what the API expects.
 - Tool descriptions should document the returned columns (models don't otherwise know the response
-  shape ahead of a call) — follow the existing pattern in `tools.ts`.
+  shape ahead of a call) — follow the existing pattern in `apiTools.ts`.
 - Dates are passed through as opaque strings (API accepts its own compact form like `"1oct20"` or
   ISO); don't add client-side date parsing/validation.
 - Adding a tool means adding a case to `CASES` in [tests/apiTools.test.mjs](tests/apiTools.test.mjs)
